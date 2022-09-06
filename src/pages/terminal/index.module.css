@@ -1,0 +1,47 @@
+.terminal {
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  background-position: 50% 50%;
+  background-size: cover;
+}
+.terminal_mask {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, .6);
+  padding: 20px;
+  overflow-y: auto;
+  color: #ddd;
+}
+.terminal_user {
+  padding-right: 8px;
+  line-height: 30px;
+}
+.terminal_input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 30px;
+  font-size: 20px;
+}
+.command_result {
+  display: flex;
+  align-items: flex-start;
+    justify-content: flex-start;
+  width: 100%;
+}
+.input_command {
+  width: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  line-height: 30px;
+  font-size: 20px;
+  color: #ddd;
+  background-color: transparent;
+  font-family: inherit;
+}
+.terminal_hint {
+  color: #999;
+}
+

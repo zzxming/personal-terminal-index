@@ -1,0 +1,28 @@
+.command_list {
+    width: 100%;
+}
+.command_list_txt {
+    margin: 0;
+    height: 30px;
+    line-height: 30px;
+}
+
+.command_item {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    grid-template-areas:' command desc';
+    line-height: 30px;
+}
+
+.command_command {
+    grid-area: command;
+}
+
+.command_desc {
+    grid-area: desc;
+}
+
+.command_option_list {
+    padding-left: 40px;
+}
+
