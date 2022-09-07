@@ -14,7 +14,13 @@ const command = {
             alias: 't',
             desc: '图片类型',
             defaultValue: 'suiji',
-            valueNeeded: true
+            valueNeeded: true,
+            legalValue: {
+                meizi: '妹子',
+                dongman: '动漫',
+                fengjing: '风景',
+                suiji: '随机'
+            }
         }
     ],
     async action(args, commandHandle) {

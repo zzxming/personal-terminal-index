@@ -23,6 +23,7 @@
 }
 
 .command_option_list {
+    margin: 0;
     padding-left: 40px;
 }
 

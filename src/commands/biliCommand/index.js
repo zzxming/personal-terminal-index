@@ -1,4 +1,3 @@
-import { getBiliSearchResult } from "../../assets/js/api";
 import { biliSearchResultList } from "./biliSearchListOutput";
 
 const result_type = [
@@ -30,6 +29,10 @@ const command = {
             desc: '搜索类型',
             defaultValue: 'video',
             valueNeeded: true,
+            legalValue: {
+                video: '视频',
+                // bili_user: '用户'
+            }
         }
     ],
     async action(args, commandHandle) {
@@ -41,7 +44,7 @@ const command = {
 
         const keywords = _[0];
 
-        return biliSearchResultList(keywords, 'video', commandHandle);
+        return biliSearchResultList(keywords, type, commandHandle);
         // return 'some'
     }
 }

@@ -21,7 +21,7 @@ const getMusicList = async (event, req, res) => {
     const lists = await searchMusicList(event.keywords);
     // console.log(lists)
     if (!lists) {
-        throw new Error('music Not found');
+        return 'music Not found';
     }
     console.log('get music list')
     return lists.map(item => ({name: item.name, id: item.id}))

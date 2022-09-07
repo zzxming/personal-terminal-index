@@ -17,47 +17,31 @@ const command = {
             alias: 't',
             desc: '获取类型',
             defaultValue: 2,
-            valueNeeded: true
+            valueNeeded: true,
+            legalValue: {
+                0: '歌单',
+                2: '歌曲'
+            }
         }, {
             key: 'id',
             alias: 'i',
             desc: '是否使用id获取',
             defaultValue: null,
-            valueNeeded: false
+            valueNeeded: false,
+            legalValue: null
         }
     ],
     async action(args, commandHandle) {
         // console.log(args)
         const { _, type, id } = args;
         const keywords = _.join(' ');
-        // 是否按id搜索
-        // const indexId = args.findIndex(v => v === '-i');
-        // let inpMusicIsId = false;
-        // if (indexId !== -1) {
-        //     inpMusicIsId = true;
-        // }
-        // // 搜索类型是什么, 默认是歌曲, 0是歌单, 2是歌曲
-        // const indexType = args.findIndex(v => v === '-t');
-        // let type = 2;
-        // if (indexType !== -1) {
-        //     let v = args[indexType + 1];
-        //     try {
-        //         if (isNaN(v)) {
-        //             throw new Error('参数错误');
-        //         }
-        //     } catch(e) {
-        //         return e.message
-        //     }
-        //     type = v;
-        // }
-        // // 关键词
-        // const keywords = args[0];
 
         // 0请求歌单,2请求歌曲
         const musicRequestOption = {
             0: { type: 0, func: getNeteaseMusicList, height: 450 },
             2: { type: 2, func: getNeteaseMusic, height: 110 }
         }
+        let urlid = keywords
         // 没有id搜索,正常关键字搜索
         if (id === null) {
             const result = await musicRequestOption[type].func(keywords);
@@ -66,20 +50,20 @@ const command = {
             if (songs.length < 1) {
                 return 'Not Found';
             }
-            else {
-                let url = `https://music.163.com/outchain/player?type=${type}&id=${songs[0].id}&auto=1&height=${musicRequestOption[type].height - 20}`;
-                return (
-                    <iframe renderkey={new Date().getTime() + url} frameBorder="no" border="0" marginWidth="0" marginHeight="0" width="330" height={musicRequestOption[type].height} src={url}></iframe>
-                )
-            }
+            urlid = songs[0].id;
         }
-        else {
-            // id搜索直接
-            let url = `https://music.163.com/outchain/player?type=${type}&id=${keywords}&auto=1&height=${musicRequestOption[type].height - 20}`;
-            return (
-                <iframe renderkey={new Date().getTime() + url} frameBorder="no" border="0" marginWidth="0" marginHeight="0" width="330" height={musicRequestOption[type].height} src={url}></iframe>
-            )
-        }
+
+        let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${musicRequestOption[type].height - 20}`;
+        return (
+            <iframe 
+                renderkey={new Date().getTime() + url} 
+                frameBorder="no" border="0" marginWidth="0" marginHeight="0" width="330" 
+                height={musicRequestOption[type].height} 
+                src={url}
+                title={`${type}${keywords}`}
+            >
+            </iframe>
+        )
     }
 }
 

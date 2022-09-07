@@ -1,12 +1,9 @@
-const { default: axios } = require("axios");
 const { biliSearch, biliPic } = require("../thirdpart/bilibiliApi");
 
-const fs = require('fs');
 
 const getBiliSearchResultApi = async (event, req, res) => {
     const { keywords, page } = event;
-    let result = await biliSearch(keywords, page);
-    return result;
+    return await biliSearch(keywords, page);;
 }
 
 const getBiliPic = async (event, req, res) => {

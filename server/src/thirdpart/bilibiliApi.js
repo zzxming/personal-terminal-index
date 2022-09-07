@@ -22,7 +22,7 @@ const biliSearch = async (keywords, page) => {
             result: data.data.data.result ?? []
         }
     })
-
+    .catch(e => e.code)
 }
 
 const biliPic = async (pic) => {
@@ -30,6 +30,7 @@ const biliPic = async (pic) => {
         responseType: 'arraybuffer'
     })
     .then(data => `data:${data.headers['content-type']};base64,${new Buffer.from(data.data, 'binary').toString('base64')}`)
+    .catch(e => e.code)
 }
 
 module.exports = {

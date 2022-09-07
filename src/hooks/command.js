@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { commandUseFunc, searchCommand } from '../commands/index'
 import { commandMap } from '../commands/registerCommand'
-import css from '../assets/css/command.module.css'
+import style from '../assets/css/command.module.css'
 
 function useCommand() {
     // commands内存jsx或者文本命令,history内存string(命令原文本)
@@ -26,9 +26,9 @@ function useCommand() {
             key = command.props.renderkey;
         }
 
-        let className = css.command_iframe;
+        let className = style.command_iframe;
         if (typeof command === 'string') {
-            className = css.command_txt;
+            className = style.command_txt;
         }
         // console.log(typeof command)
         setCommands(commands => {

@@ -12,14 +12,13 @@ function commandUseFunc(command) {
     
     const name = command.name;
     let param = '';
-    if (command.param) {
+    if (Object.keys(command.param).length > 0) {
         param = isRequired(command.param.required, command.param.desc);
     }
     let option = '';
     command.option.forEach(item => {
         option += ' ' + isRequired(item.required, `-${item.alias} ${item.desc}`);
     });
-
     return `${name} ${param} ${option}`;
 }
 

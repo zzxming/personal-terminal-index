@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { getBiliPic, getBiliSearchResult } from "../../assets/js/api";
 import { BiliVideoIframe } from "./biliVideoOutput";
 import style from './index.module.css'
 import { Pagination } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
+import ALink from "../../components/noRouteALink";
 
 const biliSearchResultList = (keywords, typeStr, commandHandle) => {
     // console.log(data)
@@ -19,15 +20,11 @@ const BiliVideoList = (props) => {
     const [data, setData] = useState([]);
     const [dataInfo, setDataInfo] = useState({});
     const [pageNum, setPageNum] = useState(1);
-
-    useEffect(() => {
-        getSearchResult(pageNum);
-    }, [keywords]);
-
-    const getSearchResult = async (page) => {
+    // 获取搜索数据
+    const getSearchResult = useCallback(async (page) => {
         setLoading(true)
         const result = await getBiliSearchResult(keywords, page)
-        // console.log(result)
+        // console.log(result, typeStr)
         const listData = result.data.data.result.find(item => item.result_type === typeStr)
         // console.log(listData)
         if (!listData) {
@@ -38,8 +35,12 @@ const BiliVideoList = (props) => {
         }
         setLoading(false);
         setDataInfo(result.data.data.pageinfo[typeStr]);
-    }
-
+    }, [keywords, typeStr]);
+    
+    useEffect(() => {
+        getSearchResult(pageNum);
+    }, [getSearchResult, pageNum]);
+    // 翻页
     const pageChange = (page) => {
         // console.log(page)
         setPageNum(page);
@@ -97,19 +98,28 @@ const BiliVideoList = (props) => {
 }
 // 视频列表项组件
 const BiliVideoItem = (props) => {
-    const {pic, bvid, play, id, danmaku, title, author, senddate, duration} = props.data;
+    // arcurl是b站视频地址, mid为up主uid, 
+    const {pic, bvid, play, id, danmaku, title, author, senddate, duration, arcurl, mid} = props.data;
     
     const [base64pic, setBase64Pic] = useState();
-    useEffect(() => {
-        getVideoPic();
-    }, [pic])
+    const [videoTextTitle] = useState(keywordsFormatStr(title));
+    const [videoJSXTitle] = useState(keywordsFormat(title));
+    const [videoTextPlay] = useState(formatNumber(play));
+    const [videoTextDanmaku] = useState(formatNumber(danmaku));
+    const [videoTextDuration] = useState(formatDuration(duration));
+    const [videoTextSendDate] = useState(new Date(senddate * 1000).toLocaleDateString().split('/').join('-'));
+    
     // 获取视频封面
-    const getVideoPic = async () => {
+    const getVideoPic = useCallback(async () => {
         let result = await getBiliPic(pic);
         // console.log(result)
         setBase64Pic(result.data.data);
-    }
+    }, [pic]);
 
+    useEffect(() => {
+        getVideoPic();
+    }, [getVideoPic])
+    // 打开视频
     const openVideo = () => {
         // console.log(props.commandHandle)
         props.commandHandle.pushCommands(<BiliVideoIframe renderkey={`video${bvid}`}  bv={bvid} />);
@@ -117,36 +127,36 @@ const BiliVideoItem = (props) => {
 
     return (
         <div className={style.video_list_item} key={id} onClick={openVideo}>
-            <a className={style.video_pic_link}>
+            <ALink className={style.video_pic_link} href={arcurl}>
                 <div className={style.video_pic_wrapper}>
-                    <img className={style.video_pic} src={base64pic} />
+                    <img className={style.video_pic} src={base64pic} alt={videoTextTitle} />
                 </div>
                 <div className={style.video_mask}>
                     <div className={style.video_status}>
                         <div className={style.video_status_left}>
                             <span className={style.video_status_item}>
                                 <svg className={style.video_status_icon}><use xlinkHref="#widget-play-count"></use></svg>
-                                <span>{formatNumber(play)}</span>    
+                                <span>{videoTextPlay}</span>    
                             </span>
                             <span className={style.video_status_item}>
                                 <svg className={style.video_status_icon}><use xlinkHref="#widget-video-danmaku"></use></svg>
-                                <span>{formatNumber(danmaku)}</span>    
+                                <span>{videoTextDanmaku}</span>    
                             </span>
                         </div>
-                        <span className={style.video_status_duration}>{formatDuration(duration)}</span>
+                        <span className={style.video_status_duration}>{videoTextDuration}</span>
                     </div>
                 </div>
-            </a>
+            </ALink>
             <div className={style.video_info}>
-                <a className={style.video_info_title_link}>
-                    <h3 className={style.video_info_title} title={keywordsFormatStr(title)}>{ keywordsFormat(title) }</h3>
-                </a>
+                <ALink className={style.video_info_title_link} href={arcurl}>
+                    <h3 className={style.video_info_title} title={videoTextTitle}>{ videoJSXTitle }</h3>
+                </ALink>
                 <p className={style.video_info_sub}>
-                    <a className={style.video_info_sub_link} title={author}>
+                    <ALink className={style.video_info_sub_link} title={author} href={`https://space.bilibili.com/${mid}`}>
                         <svg className={style.video_status_icon}><use xlinkHref="#widget-up"></use></svg>
                         <span className={style.video_info_author}>{author}</span>
-                        <span className={style.video_info_date}>{new Date(senddate * 1000).toLocaleDateString().split('/').join('-')}</span>
-                    </a>
+                        <span className={style.video_info_date}>{videoTextSendDate}</span>
+                    </ALink>
                 </p>
             </div>
         </div>

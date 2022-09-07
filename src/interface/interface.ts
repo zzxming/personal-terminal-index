@@ -5,6 +5,9 @@ interface ICommandOption<T> {
     desc: string            // 参数描述
     defaultValue: T         // 参数默认值
     valueNeeded: boolean    // 此参数是否需要值
+    leagalValue: {
+        any: any
+    } | null   // 合法值数组, null为任何值
 }
 
 interface ICommandParam {
