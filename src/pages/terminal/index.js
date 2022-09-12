@@ -20,7 +20,7 @@ function Terminal() {
 
     // 更新一定要在父组件, 不如不能引起app的render, 导致不能从hook中获取最新的commands
     function commit() {
-        excuteCommand(inp.current.value, commandHandle);
+        excuteCommand(inp.current.value.trim(), commandHandle);
         inp.current.value = '';
         setHintTxt('');
     }

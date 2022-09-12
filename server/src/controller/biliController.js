@@ -1,9 +1,9 @@
-const { biliSearch, biliPic } = require("../thirdpart/bilibiliApi");
+const { biliSearch, biliPic, biliSearchType } = require("../thirdpart/bilibiliApi");
 
 
 const getBiliSearchResultApi = async (event, req, res) => {
-    const { keywords, page } = event;
-    return await biliSearch(keywords, page);;
+    const { keywords, page, pageSize } = event;
+    return await biliSearch({keywords, page, pageSize});
 }
 
 const getBiliPic = async (event, req, res) => {
@@ -17,7 +17,13 @@ const getBiliPic = async (event, req, res) => {
     return await biliPic(pic);
 }
 
+const getBiliSearchTypeResultApi = async (event, req, res) => {
+    const { keywords, page, pageSize, search_type } = event;
+    return await biliSearchType({keywords, page, pageSize, search_type});
+}
+
 module.exports = {
     getBiliSearchResultApi,
-    getBiliPic
+    getBiliPic,
+    getBiliSearchTypeResultApi
 }

@@ -24,6 +24,10 @@ const routes = [
         path: '/bili/pic',
         method: 'get',
         handle: require('./controller/biliController').getBiliPic
+    }, {
+        path: '/bili/searchtype',
+        method: 'get',
+        handle: require('./controller/biliController').getBiliSearchTypeResultApi
     }
 ];
 

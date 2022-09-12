@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { getBiliPic, getBiliSearchResult } from "../../assets/js/api";
+import { getBiliPic, getBiliSearchResult, getBiliSearchTypeResult } from "../../assets/js/api";
 import { BiliVideoIframe } from "./biliVideoOutput";
 import style from './index.module.css'
 import { Pagination } from 'antd'
@@ -8,43 +8,69 @@ import ALink from "../../components/noRouteALink";
 
 const biliSearchResultList = (keywords, typeStr, commandHandle) => {
     // console.log(data)
-    
+    // 根据类型筛查展示结果
 
     return <BiliVideoList renderkey={typeStr} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
 }
-
+// 搜索视频列表
+// 找不到bilibili 的搜索结果数量,只能拿结果中的
 const BiliVideoList = (props) => {
     const { keywords, commandHandle, typeStr } = props;
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
-    const [dataInfo, setDataInfo] = useState({});
+    const [dataInfo, setDataInfo] = useState({});   // numPages一页数据量, numResults总数据量, pagesize返回数据量
     const [pageNum, setPageNum] = useState(1);
-    // 获取搜索数据
-    const getSearchResult = useCallback(async (page) => {
-        setLoading(true)
-        const result = await getBiliSearchResult(keywords, page)
-        // console.log(result, typeStr)
-        const listData = result.data.data.result.find(item => item.result_type === typeStr)
-        // console.log(listData)
-        if (!listData) {
+    const [pageSize, setPageSize] = useState(24);
+    const [searchType, setSearchType] = useState(typeStr);
+
+    // 获取所有类型的搜索数据结果
+    // const getSearchResult = useCallback(async (page) => {
+    //     setLoading(true)
+    //     const result = await getBiliSearchResult({keywords, page, pageSize})
+    //     // console.log(result, typeStr)
+    //     const result.data = result.data.data.result.find(item => item.result_type === typeStr)
+    //     // console.log(listData)
+    //     if (!listData) {
+    //         setData([]);
+    //     }
+    //     else {
+    //         setData(listData.data);
+    //     }
+    //     setLoading(false);
+    //     setDataInfo(result.data.data.pageinfo[typeStr]);
+    // }, [keywords, typeStr]);
+    
+    // useEffect(() => {
+    //     getSearchResult(pageNum);
+    // }, [getSearchResult, pageNum]);
+
+    // 获取某类型的搜索结果
+    const getVideoSearchResult = useCallback(async (page) => {
+        setLoading(true);
+        const result = await getBiliSearchTypeResult({keywords, page, pageSize, search_type: searchType})
+        // console.log(result)
+        const { numPages, numResults, pagesize, result: datalist } = result.data.data;
+        if (!datalist) {
             setData([]);
         }
         else {
-            setData(listData.data);
+            setData(datalist);
         }
         setLoading(false);
-        setDataInfo(result.data.data.pageinfo[typeStr]);
-    }, [keywords, typeStr]);
-    
+        setDataInfo({numPages, numResults, pagesize})
+    }, [keywords, typeStr, searchType, pageSize]);
+
     useEffect(() => {
-        getSearchResult(pageNum);
-    }, [getSearchResult, pageNum]);
+        getVideoSearchResult(pageNum)
+    }, [getVideoSearchResult, pageNum])
+
     // 翻页
     const pageChange = (page) => {
         // console.log(page)
         setPageNum(page);
-        getSearchResult(page)
+        // getSearchResult(page)
+        getVideoSearchResult(page)
     }
 
     return (
@@ -79,18 +105,20 @@ const BiliVideoList = (props) => {
                     </svg>
             }
             {
-                data.map(item => {
-                    return (
-                        <BiliVideoItem key={`list${item.bvid}`} data={item} commandHandle={commandHandle} />
-                    )
-                })
+                data.length > 0 ? 
+                    data.map(item => {
+                        return (
+                            <BiliVideoItem key={`list${item.bvid}`} data={item} commandHandle={commandHandle} />
+                        )
+                    }) :
+                    loading ? 
+                        '' : 
+                        <p style={{margin: '0', marginRight: 'auto'}}>无搜索结果</p> 
             }
             {
                 data.length > 0 && !loading ? 
-                    <Pagination showSizeChanger={false} current={pageNum} onChange={pageChange} total={dataInfo.total} /> 
-                    : loading ? 
-                        '' 
-                        : <p style={{margin: '0', marginRight: 'auto'}}>无搜索结果</p>
+                    <Pagination pageSize={pageSize} showSizeChanger={false} current={pageNum} onChange={pageChange} total={dataInfo.numResults} /> 
+                    : ''
             }
             
         </div>
@@ -129,18 +157,31 @@ const BiliVideoItem = (props) => {
         <div className={style.video_list_item} key={id} onClick={openVideo}>
             <ALink className={style.video_pic_link} href={arcurl}>
                 <div className={style.video_pic_wrapper}>
-                    <img className={style.video_pic} src={base64pic} alt={videoTextTitle} />
+                    { 
+                        base64pic ? 
+                            <img className={style.video_pic} src={base64pic} alt={videoTextTitle} /> :
+                            <LoadingOutlined style={{
+                                position: 'absolute',
+                                top: '0',
+                                left: '0',
+                                right: '0',
+                                bottom: '0',
+                                width: '20px',
+                                height: '20px',
+                                margin: 'auto',
+                            }} />
+                    }
                 </div>
                 <div className={style.video_mask}>
                     <div className={style.video_status}>
                         <div className={style.video_status_left}>
                             <span className={style.video_status_item}>
                                 <svg className={style.video_status_icon}><use xlinkHref="#widget-play-count"></use></svg>
-                                <span>{videoTextPlay}</span>    
+                                <span className={style.video_status_play}>{videoTextPlay}</span>    
                             </span>
                             <span className={style.video_status_item}>
                                 <svg className={style.video_status_icon}><use xlinkHref="#widget-video-danmaku"></use></svg>
-                                <span>{videoTextDanmaku}</span>    
+                                <span className={style.video_status_danmaku}>{videoTextDanmaku}</span>    
                             </span>
                         </div>
                         <span className={style.video_status_duration}>{videoTextDuration}</span>

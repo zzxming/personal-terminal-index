@@ -24,6 +24,18 @@ export const getNeteaseMusicList = async (keywords) => await axios.post('/music/
  */
 export const getBackgroundImageUrl = async (type) => await axios.get('/background/random', { params: { type } });
 
-
-export const getBiliSearchResult = async (keywords, page) => await axios.get('/bili/search', { params: { keywords, page } })
+/**
+ * bilibili搜索
+ * @param { keywords, page, pageSize } params 关键词, 请求页数, 一页数据量
+ * @returns 
+ */
+export const getBiliSearchResult = async (params) => await axios.get('/bili/search', { params })
 export const getBiliPic = async (pic) => await axios.get('/bili/pic', { params: { pic } })
+
+/**
+ * 
+ * @param { keywords, page, pageSize, search_type }  关键词, 请求页数, 一页数据量, 搜索类型
+ * @returns 
+ */
+export const getBiliSearchTypeResult = async (params) => await axios.get('/bili/searchtype', { params })
+

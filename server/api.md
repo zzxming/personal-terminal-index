@@ -66,6 +66,7 @@
     参数：{
         keywords: string, 搜索关键字
         page: number, 结果当前页
+        pageSize: number, 一页数据量
     }
     返回值：{
         code: number(0)
@@ -103,5 +104,36 @@
     返回值：{
         code: number(0)
         data: string, base64图片地址
+    }
+    ```
+# /bili/searchtype
+    ```
+    参数：{
+        keywords: string, 搜索关键字
+        page: number, 结果当前页
+        pageSize: number, 一页数据量
+        search_type: string, 搜索类型
+    }
+    返回值：{
+        code: number(0)
+        data: [
+            {
+                page: number, 搜索页数
+                pagesize: number, 返回数据量
+                numResults: number, 总数据量
+                numPages: number, 一页数据量
+                result: [
+                    {
+                        type: string, 类型
+                        author: string, 作者名称
+                        pic: string, 视频封面
+                        title: string, 视频标题
+                        play: number, 播放量
+                        danmaku: number, 弹幕数
+                        duration: number, 视频时长, hh:mm:ss
+                    }
+                ]
+            }
+        ]
     }
     ```
