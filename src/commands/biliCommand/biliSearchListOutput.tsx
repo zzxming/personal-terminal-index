@@ -170,7 +170,7 @@ const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
     // 打开视频
     const openVideo = () => {
         // console.log(props.commandHandle)
-        props.commandHandle.pushCommands(<BiliVideoIframe key={`video${bvid}`}  bv={bvid} />);
+        props.commandHandle.pushCommands(<BiliVideoIframe key={`video${bvid}`} bv={bvid} />, true);
     }
 
     return (

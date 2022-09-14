@@ -7,6 +7,7 @@ import { CommandOption } from "../interface/interface";
 interface Command {
     key: string
     construct: React.ReactElement
+    isResult: boolean
 }
 interface HistoryCommand {
     txt: string
@@ -23,7 +24,7 @@ export interface UseCommandHook {
     setHistoryCommandsIndex: React.Dispatch<React.SetStateAction<number>>
     excuteCommand: (command: string, commandHandle: UseCommandHook) => void
     setHint: (str: string) => string
-    pushCommands: (command: React.ReactElement | string) => void
+    pushCommands: (command: React.ReactElement | string, isResult: boolean) => void
 }
 const useCommand = (): UseCommandHook => {
     // commands内存jsx或者文本命令,history内存string(命令原文本)
@@ -39,7 +40,7 @@ const useCommand = (): UseCommandHook => {
         setHistoryCommandsIndex(historyCommands.length);
     }, [historyCommands]);
 
-    function pushCommands(command: React.ReactElement | string) {
+    function pushCommands(command: React.ReactElement | string, isResult: boolean) {
         if (command === '') return;
         // 当命令不是字符串时,元素需要key值不正确
         if (typeof command !== 'string' && !command.key) {
@@ -65,7 +66,7 @@ const useCommand = (): UseCommandHook => {
             // console.log(commands)
             return [...commands, {
                 construct: <div className={className}>{command}</div>,
-                key 
+                key, isResult
             }]
         });
     }
@@ -128,7 +129,7 @@ const useCommand = (): UseCommandHook => {
      */
     async function excuteCommand(command: string, commandHandle: UseCommandHook) {
         console.log('excute', command)
-        pushCommands(command);
+        pushCommands(command, false);
         if (command.trim() === '') return;
         pushHistoryCommands(command);
 
@@ -144,7 +145,7 @@ const useCommand = (): UseCommandHook => {
             const paramsObj = paramParse(commandFragment.slice(1), option);
             if (resultCommand.param?.required && paramsObj._.length < 1) {
                 // param参数必须,但未输入
-                pushCommands('param参数缺少');
+                pushCommands('param参数缺少', true);
                 return;
             }
             // option参数, 赋默认值
@@ -165,7 +166,7 @@ const useCommand = (): UseCommandHook => {
             // 命令不存在
             result = '命令不存在';
         }
-        pushCommands(result);
+        pushCommands(result, true);
         // console.log(commands)
         // return result;
     }

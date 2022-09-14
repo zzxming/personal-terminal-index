@@ -100,9 +100,11 @@ const Terminal: React.FC = () => {
         <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
             <div ref={mask} className={css.terminal_mask}>
                 {
-                    commands && commands.map((item: any) => (
+                    commands && commands.map((item) => (
                         <div className={css.command_result} key={item.key}>
-                            <span className={css.terminal_user}>[local]:</span>
+                            {
+                                item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
+                            }
                             {item.construct}
                         </div>
                     ))
