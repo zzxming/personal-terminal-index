@@ -1,9 +1,13 @@
+import { Fragment } from 'react';
 import {
+    AxiosResult,
     getNeteaseMusic,
     getNeteaseMusicList,
+    MusicResult,
 } from '../../assets/js/api'
+import { Command } from '../../interface/interface';
 
-const command = {
+const command: Command = {
     name: 'music',
     desc: '网易云音乐',
     param: {
@@ -26,9 +30,12 @@ const command = {
             key: 'id',
             alias: 'i',
             desc: '是否使用id获取',
-            defaultValue: null,
+            defaultValue: false,
             valueNeeded: false,
-            legalValue: null
+            legalValue: {
+                false: '不使用id搜索',
+                true: '使用id搜索',
+            }
         }
     ],
     async action(args, commandHandle) {
@@ -37,14 +44,17 @@ const command = {
         const keywords = _.join(' ');
 
         // 0请求歌单,2请求歌曲
-        const musicRequestOption = {
+        const musicRequestOption: {
+            [key: string]: { type: number; func: (keywords: any) => Promise<AxiosResult<MusicResult[]>>; height: number; }
+        } = {
             0: { type: 0, func: getNeteaseMusicList, height: 450 },
             2: { type: 2, func: getNeteaseMusic, height: 110 }
         }
-        let urlid = keywords
+        const getTypeOption = musicRequestOption[type as number];
+        let urlid: string | number = keywords;
         // 没有id搜索,正常关键字搜索
-        if (id === null) {
-            const result = await musicRequestOption[type].func(keywords);
+        if (!id) {
+            const result = await getTypeOption.func(keywords);
             // console.log(result)
             const songs = result.data.data;
             if (songs.length < 1) {
@@ -53,16 +63,17 @@ const command = {
             urlid = songs[0].id;
         }
 
-        let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${musicRequestOption[type].height - 20}`;
+        let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${getTypeOption.height - 20}`;
         return (
-            <iframe 
-                renderkey={new Date().getTime() + url} 
-                frameBorder="no" border="0" marginWidth="0" marginHeight="0" width="330" 
-                height={musicRequestOption[type].height} 
-                src={url}
-                title={`${type}${keywords}`}
-            >
-            </iframe>
+            <div key={new Date().getTime() + url}>
+                <iframe 
+                    frameBorder="no" marginWidth={0} marginHeight={0} width="330" 
+                    height={getTypeOption.height} 
+                    src={url}
+                    title={`${keywords}`}
+                >
+                </iframe>
+            </div>
         )
     }
 }

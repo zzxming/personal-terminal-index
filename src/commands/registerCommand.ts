@@ -4,8 +4,9 @@ import { command as backgroundCommand } from './backgroundCommand'
 import { command as helpCommand } from './helpCommand';
 import { command as clearCommand } from './clearCommand';
 import { command as biliCommand } from './biliCommand';
+import { Command } from '../interface/interface';
 
-const commandMap = [
+const commandMap: Command[] = [
     musicCommand,
     fanyiCommand,
     backgroundCommand,

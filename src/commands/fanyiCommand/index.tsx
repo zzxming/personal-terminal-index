@@ -1,7 +1,10 @@
-import { fanyiApi } from '../../assets/js/api'
+import { fanyiApi, FanyiRejResult, FanyiResResult } from '../../assets/js/api'
 import css from '../../assets/css/command.module.css'
+import { Command } from '../../interface/interface';
 
-const lang = {
+const lang: {
+    [key: string]: string
+} = {
     zh: '中文', en: '英语', jp: '日语', fra: '法语', wyw: '文言文', spa: '西班牙语', mg: '马拉加斯语', 
     ru: '俄语', it: '意大利语', de: '德语', nl: '荷兰语', pl: '波兰语', dan: '丹麦语', kas: '克什米尔语',
     cs: '捷克语', hu: '匈牙利语', vie: '越南语', kor: '韩语', th: '泰语', srp: '塞尔维亚语', mlt: '马耳他语',
@@ -34,7 +37,7 @@ const lang = {
     iku: '伊努克提图特语', ir: '伊朗语', yue: '粤语', zaz: '扎扎其语', frm: '中古法语', zul: '祖鲁语', jav: '爪哇语'
 }
 
-const command = {
+const command: Command = {
     name: 'fanyi',
     desc: '百度翻译',
     param: {
@@ -65,22 +68,24 @@ const command = {
         const keywords = _.join(' ');
         
         // console.log(param, to, from)
-        const result = await fanyiApi({ keywords, to, from });
+        const result = await fanyiApi({ keywords, to: to as string, from: from as string });
         // console.log(result)
         const data = result.data.data;
         // console.log(data)
-        if (data.error_code) {
+        if ((data as FanyiRejResult).error_code) {
+            const { error_code, error_message } = data as FanyiRejResult;
             // console.log(data.error_msg);
             return (
-                <div renderkey={new Date().getTime() + data.error_code} className={css.command_txt}>
-                    error code：{data.error_code}, {data.error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
+                <div key={error_code} className={css.command_txt}>
+                    error code：{error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
                 </div>
             )
         }
         else {
+            const { trans_result, to, from } = data as FanyiResResult;
             return (
-                <div renderkey={new Date().getTime() + data.trans_result[0].dst} className={css.command_txt}>
-                    从{lang[data.from]}：{data.trans_result[0].src}，翻译成{lang[data.to]}：{data.trans_result[0].dst}
+                <div key={trans_result[0].src + trans_result[0].dst} className={css.command_txt}>
+                    从{lang[from]}：{trans_result[0].src}，翻译成{lang[to]}：{trans_result[0].dst}
                 </div>
             );
         }

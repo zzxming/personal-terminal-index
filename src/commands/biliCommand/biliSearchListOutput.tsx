@@ -1,25 +1,37 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { getBiliPic, getBiliSearchResult, getBiliSearchTypeResult } from "../../assets/js/api";
+import { getBiliPic, getBiliSearchTypeResult } from "../../assets/js/api";
 import { BiliVideoIframe } from "./biliVideoOutput";
 import style from './index.module.css'
-import { Pagination } from 'antd'
+import { Pagination, PaginationProps } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import ALink from "../../components/noRouteALink";
+import { UseCommandHook } from "../../hooks/command";
+import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo } from "../../interface/interface";
 
-const biliSearchResultList = (keywords, typeStr, commandHandle) => {
+const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: UseCommandHook) => {
     // console.log(data)
     // 根据类型筛查展示结果
 
-    return <BiliVideoList renderkey={typeStr} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
+    return <BiliVideoList key={typeStr} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
 }
 // 搜索视频列表
+interface BiliVideoListProps {
+    keywords: string
+    commandHandle: UseCommandHook
+    typeStr: string
+}
 // 找不到bilibili 的搜索结果数量,只能拿结果中的
-const BiliVideoList = (props) => {
+const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
     const { keywords, commandHandle, typeStr } = props;
 
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState([]);
-    const [dataInfo, setDataInfo] = useState({});   // numPages一页数据量, numResults总数据量, pagesize返回数据量
+    const [data, setData] = useState<BiliTypeVideo[]>([]);
+    const [dataInfo, setDataInfo] = useState<BiliVideoSearchInfo>({
+        numPages: 0,
+        numResults: 0,
+        pagesize: 0,
+        page: 0
+    });   // numPages一页数据量, numResults总数据量, pagesize返回数据量
     const [pageNum, setPageNum] = useState(1);
     const [pageSize, setPageSize] = useState(24);
     const [searchType, setSearchType] = useState(typeStr);
@@ -46,19 +58,23 @@ const BiliVideoList = (props) => {
     // }, [getSearchResult, pageNum]);
 
     // 获取某类型的搜索结果
-    const getVideoSearchResult = useCallback(async (page) => {
+    const getVideoSearchResult = useCallback(async (toPage: number) => {
         setLoading(true);
-        const result = await getBiliSearchTypeResult({keywords, page, pageSize, search_type: searchType})
+        
+        // console.log(await getBiliSearchResult({keywords, page: toPage, pageSize}))
+
+        const result = await getBiliSearchTypeResult({keywords, page: toPage, pageSize, search_type: searchType})
         // console.log(result)
-        const { numPages, numResults, pagesize, result: datalist } = result.data.data;
+        const { numPages, numResults, pagesize, page, result: datalist } = result.data.data;
         if (!datalist) {
-            setData([]);
+            setData([] as BiliTypeVideo[]);
         }
         else {
             setData(datalist);
         }
         setLoading(false);
-        setDataInfo({numPages, numResults, pagesize})
+        setPageNum(page);
+        setDataInfo({numPages, numResults, pagesize, page});
     }, [keywords, typeStr, searchType, pageSize]);
 
     useEffect(() => {
@@ -66,7 +82,7 @@ const BiliVideoList = (props) => {
     }, [getVideoSearchResult, pageNum])
 
     // 翻页
-    const pageChange = (page) => {
+    const pageChange: PaginationProps['onChange'] = (page) => {
         // console.log(page)
         setPageNum(page);
         // getSearchResult(page)
@@ -124,8 +140,12 @@ const BiliVideoList = (props) => {
         </div>
     )
 }
+interface BiliVideoItemProps {
+    data: BiliVideo
+    commandHandle: UseCommandHook
+}
 // 视频列表项组件
-const BiliVideoItem = (props) => {
+const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
     // arcurl是b站视频地址, mid为up主uid, 
     const {pic, bvid, play, id, danmaku, title, author, senddate, duration, arcurl, mid} = props.data;
     
@@ -150,7 +170,7 @@ const BiliVideoItem = (props) => {
     // 打开视频
     const openVideo = () => {
         // console.log(props.commandHandle)
-        props.commandHandle.pushCommands(<BiliVideoIframe renderkey={`video${bvid}`}  bv={bvid} />);
+        props.commandHandle.pushCommands(<BiliVideoIframe key={`video${bvid}`}  bv={bvid} />);
     }
 
     return (
@@ -205,14 +225,14 @@ const BiliVideoItem = (props) => {
 }
 
 // 格式化数字
-function formatNumber(num) {
+function formatNumber(num: number) {
     if (num > 10000) {
         return `${(num / 10000).toFixed(1)}万`
     }
     return num
 }
 // 格式化时间
-function formatDuration(duration) {
+function formatDuration(duration: string) {
     let arr = duration.split(':')
     arr = arr.map(value => {
         if (value.length < 2 && !value.startsWith('0')) {
@@ -223,7 +243,7 @@ function formatDuration(duration) {
     return arr.join(':')
 }
 // 将结果中的<em>标签去除
-function keywordsFormatStr(str) {
+function keywordsFormatStr(str: string) {
     const reg = /(<em class="keyword">)(.+?)(<\/em>)/g;
     let result = str.replace(reg,  function(originStr, _, content) {
         return content
@@ -231,14 +251,15 @@ function keywordsFormatStr(str) {
     return result
 }
 // 将结果中的<em>标签作为jsx输出
-function keywordsFormat(str) {
+function keywordsFormat(str: string) {
     const reg = /(<em class="keyword">)(.+?)(<\/em>)/g;
-    const titleArr = [];
+    const titleArr: { index: number, len: number, content: string }[] = [];
     // 找到关键字位置信息
     str.replace(reg,  function(originStr, $1, content, $2, index) {
         // console.log(arguments)
         // console.log(originStr)
         titleArr.push({index,len: originStr.length, content})
+        return originStr;
     });
     // 标题中没有关键字直接返回原字符串
     if (titleArr.length < 1) {

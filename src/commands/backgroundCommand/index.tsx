@@ -1,6 +1,7 @@
-import { getBackgroundImageUrl } from "../../assets/js/api"
+import { getBackgroundImageUrl, ImageType } from "../../assets/js/api"
+import { Command } from "../../interface/interface";
 
-const command = {
+const command: Command = {
     name: 'bg',
     desc: '切换背景图片',
     param: {
@@ -32,7 +33,7 @@ const command = {
             return '更换成功';
         }
 
-        const result = await getBackgroundImageUrl(type);
+        const result = await getBackgroundImageUrl(type as ImageType);
         if (result.data.data === '') {
             return '请求失败';
         }

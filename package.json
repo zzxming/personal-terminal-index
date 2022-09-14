@@ -1,16 +1,20 @@
 {
-  "name": "do-something-cool",
+  "name": "my-terminal",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/lodash": "^4.14.185",
+    "@types/node": "^18.7.17",
+    "@types/react": "^18.0.19",
+    "@types/react-dom": "^18.0.6",
     "antd": "^4.23.0",
     "axios": "^0.27.2",
     "css-loader": "^6.7.1",
     "http-proxy-middleware": "^2.0.6",
-    "loadsh": "^0.0.4",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
@@ -44,5 +48,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "typescript": "^4.8.3"
   }
 }

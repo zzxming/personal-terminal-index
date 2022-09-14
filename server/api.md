@@ -88,7 +88,9 @@
                             title: string, 视频标题
                             play: number, 播放量
                             danmaku: number, 弹幕数
-                            duration: number, 视频时长, hh:mm:ss
+                            duration: string, 视频时长, hh:mm:ss
+                            bvid: string, bv号
+                            mid: number, up主id
                         }
                     ]
                 }
@@ -130,7 +132,9 @@
                         title: string, 视频标题
                         play: number, 播放量
                         danmaku: number, 弹幕数
-                        duration: number, 视频时长, hh:mm:ss
+                        duration: string, 视频时长, hh:mm:ss
+                        bvid: string, bv号
+                        mid: number, up主id
                     }
                 ]
             }

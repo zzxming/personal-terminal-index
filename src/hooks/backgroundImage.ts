@@ -3,9 +3,9 @@ import { useCallback, useEffect, useState } from "react"
 
 function useBackgroundImage() {
 
-    const [imgurl, setImgurl] = useState('');
+    const [imgurl, setImgurl] = useState<string>('');
 
-    const setbackgroundImage = useCallback((imgurl) => {
+    const setbackgroundImage = useCallback((imgurl: string) => {
         // console.log(imgurl)
         localStorage.setItem('bgurl', imgurl);
         setImgurl(imgurl);
@@ -14,10 +14,10 @@ function useBackgroundImage() {
     
     useEffect(() => {
         // 要监听到localstorage的变化
-        setbackgroundImage(localStorage.getItem('bgurl'));
+        setbackgroundImage(localStorage.getItem('bgurl') || '');
         function updateBg() {
             // console.log(localStorage.getItem('bgurl'))
-            setImgurl(localStorage.getItem('bgurl'));
+            setImgurl(localStorage.getItem('bgurl') || '');
         }
         window.addEventListener('setItem', updateBg);
         return () => {

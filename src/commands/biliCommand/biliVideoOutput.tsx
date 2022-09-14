@@ -1,14 +1,19 @@
 import { createRef, useEffect, useState } from "react"
 import { LoadingOutlined } from '@ant-design/icons'
 
-const BiliVideoIframe = (props) => {
+interface BiliVideoIframeProps {
+    bv: string
+}
+const BiliVideoIframe: React.FC<BiliVideoIframeProps> = (props) => {
 
-    const iframe = createRef();
+    const iframe = createRef<HTMLIFrameElement>();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        iframe.current.onload = () => {
-            setLoading(false)
+        if (iframe.current) {
+            iframe.current.onload = () => {
+                setLoading(false)
+            }
         }
     }, [])
 
@@ -29,16 +34,14 @@ const BiliVideoIframe = (props) => {
                 height="500" 
                 style={{position:'relative', backgroundColor: 'rgba(0, 0, 0, .3)'}}
                 src={`https://player.bilibili.com/player.html?bvid=${props.bv}&page=1&as_wide=1&high_quality=1&danmaku=1`}
-                scrolling="no" border="0" frameBorder="no" framespacing="0" allowFullScreen={true}
+                scrolling="no" frameBorder="no" allowFullScreen={true}
             >
                 
             </iframe>
             {/* <iframe 
                 src="//player.bilibili.com/player.html?aid=472638029&high_quality=1&as_wide=1&bvid=BV17T411c7wz&page=1&danmaku=0" 
                 scrolling="no" 
-                border="0" 
                 frameBorder="no" 
-                framespacing="0" 
                 width="60%"
                 height="400"
                 allowFullScreen={true}

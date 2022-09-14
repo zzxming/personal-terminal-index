@@ -1,4 +1,5 @@
 import { biliSearchResultList } from "./biliSearchListOutput";
+import { Command } from '../../interface/interface';
 
 const result_type = [
     'tips', 
@@ -14,7 +15,7 @@ const result_type = [
     'video'
 ]
 
-const command = {
+const command: Command = {
     name: 'bili',
     desc: 'b站搜索',
     param: {
@@ -38,11 +39,11 @@ const command = {
     async action(args, commandHandle) {
         // console.log(args)
         const { _, type } = args;
-        if (!result_type.includes(type)) {
+        if (!result_type.includes(type as string)) {
             return 'option type error'
         }
 
-        const keywords = _[0];
+        const keywords = _.join(' ');
 
         return biliSearchResultList(keywords, type, commandHandle);
         // return 'some'

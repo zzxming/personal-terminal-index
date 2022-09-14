@@ -1,8 +1,9 @@
 import { searchCommand } from "..";
+import { Command } from "../../interface/interface";
 import { commandDetail, commandList } from "./helpCommandOutput";
 
 
-const command = {
+const command: Command = {
     name: 'help',
     desc: '查看命令帮助',
     param: {
@@ -19,7 +20,9 @@ const command = {
             // 没有param参数, 直接输出command list
             return commandList()
         } else {
-            return commandDetail(searchCommand(_.join(' ')));
+            let getCommand = searchCommand(_.join(' '));
+            if (!getCommand) return '没找到命令'
+            return commandDetail(getCommand);
         }
     }
 }
