@@ -65,7 +65,7 @@ const command: Command = {
 
         let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${getTypeOption.height - 20}`;
         return (
-            <div key={new Date().getTime() + url}>
+            <div key={`music result ${url}`}>
                 <iframe 
                     frameBorder="no" marginWidth={0} marginHeight={0} width="330" 
                     height={getTypeOption.height} 

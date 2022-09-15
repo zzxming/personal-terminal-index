@@ -101,11 +101,11 @@ const Terminal: React.FC = () => {
             <div ref={mask} className={css.terminal_mask}>
                 {
                     commands && commands.map((item) => (
-                        <div className={css.command_result} key={item.key}>
+                        <div className={css.command_result} key={'local' + item.key}>
                             {
                                 item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
                             }
-                            {item.construct}
+                            { item.construct }
                         </div>
                     ))
                 }

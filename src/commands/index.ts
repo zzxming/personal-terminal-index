@@ -4,7 +4,7 @@ import { commandMap } from "./registerCommand";
 function searchCommand(command: string) {
     return commandMap.find(existCommand => command === existCommand.name) || null;
 }
-
+// 命令使用提示文字
 function commandUseFunc(command: Command): string {
     if (!command) return '';
     function isRequired(required: boolean, desc: string) {

@@ -12,7 +12,7 @@ const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: 
     // console.log(data)
     // 根据类型筛查展示结果
 
-    return <BiliVideoList key={typeStr} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
+    return <BiliVideoList key={`bili search result ${typeStr} ${new Date().getTime()}`} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
 }
 // 搜索视频列表
 interface BiliVideoListProps {
@@ -124,7 +124,7 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
                 data.length > 0 ? 
                     data.map(item => {
                         return (
-                            <BiliVideoItem key={`list${item.bvid}`} data={item} commandHandle={commandHandle} />
+                            <BiliVideoItem key={`list ${item.bvid}`} data={item} commandHandle={commandHandle} />
                         )
                     }) :
                     loading ? 

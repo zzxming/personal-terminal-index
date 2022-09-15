@@ -5,6 +5,7 @@ import { command as helpCommand } from './helpCommand';
 import { command as clearCommand } from './clearCommand';
 import { command as biliCommand } from './biliCommand';
 import { command as historyCommand } from './historyCommand';
+import { command as logCommand } from './logCommand';
 import { Command } from '../interface/interface';
 
 const commandMap: Command[] = [
@@ -15,6 +16,7 @@ const commandMap: Command[] = [
     clearCommand,
     biliCommand,
     historyCommand,
+    logCommand,
 ]
 
 export {

@@ -19,18 +19,19 @@ const command: Command = {
             return '请输入合法数字参数';
         }
         const { historyCommands } = commandHandle;
-        const showHistoryCommands = num === 0 ? historyCommands : historyCommands.slice(0, num);
+        const sortHistoryCommands = [...historyCommands].reverse();
+        const showHistoryCommands = num === 0 ? sortHistoryCommands : sortHistoryCommands.slice(0, num);
 
-        // console.log(showHistoryCommands)
+        // console.log(sortHistoryCommands)
 
         return (
-            <div key={new Date().getTime() + 'history'} className={style.history}>
+            <div key={`history result ${new Date().getTime()}`} className={style.history}>
                 <List
                     itemLayout="vertical"
                     dataSource={showHistoryCommands}
                     renderItem={(item, index) => (
                         <li className={style.history_item}>
-                            {index} {item.txt}
+                            {index + 1} {item.txt}
                         </li>
                     )}
                 />

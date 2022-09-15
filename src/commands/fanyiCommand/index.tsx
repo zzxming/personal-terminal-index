@@ -76,7 +76,7 @@ const command: Command = {
             const { error_code, error_message } = data as FanyiRejResult;
             // console.log(data.error_msg);
             return (
-                <div key={error_code} className={css.command_txt}>
+                <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
                     error code：{error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
                 </div>
             )
@@ -84,7 +84,7 @@ const command: Command = {
         else {
             const { trans_result, to, from } = data as FanyiResResult;
             return (
-                <div key={trans_result[0].src + trans_result[0].dst} className={css.command_txt}>
+                <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
                     从{lang[from]}：{trans_result[0].src}，翻译成{lang[to]}：{trans_result[0].dst}
                 </div>
             );

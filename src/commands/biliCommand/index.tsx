@@ -45,7 +45,7 @@ const command: Command = {
 
         const keywords = _.join(' ');
 
-        return biliSearchResultList(keywords, type, commandHandle);
+        return biliSearchResultList(keywords, type as string, commandHandle);
         // return 'some'
     }
 }

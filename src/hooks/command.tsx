@@ -50,7 +50,7 @@ const useCommand = (): UseCommandHook => {
         
         let key: string;
         if (typeof command === 'string') {
-            key = new Date().getTime() + command;
+            key = `input ${command} ${new Date().getTime()}`;
         }
         else {
             key = command.key?.toString() ?? new Date().getTime().toString();
@@ -65,7 +65,7 @@ const useCommand = (): UseCommandHook => {
         setCommands(commands => {
             // console.log(commands)
             return [...commands, {
-                construct: <div className={className}>{command}</div>,
+                construct: <div className={className} onClick={(e) => e.stopPropagation()}>{command}</div>,
                 key, isResult
             }]
         });
