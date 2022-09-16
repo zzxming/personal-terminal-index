@@ -1,124 +1,202 @@
 import { Badge, DatePicker, Form, Input, InputNumber, Popconfirm, Switch, Table, TimePicker, Typography } from "antd";
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useEffect, useMemo, useCallback, useState, Fragment } from "react";
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 import moment from 'moment'
 import { ColumnType } from "antd/lib/table";
 import { Rule } from "antd/lib/form";
+import css from './index.module.css'
 
+
+
+
+// 目前不能新增
+
+/**
+ * 可修改的输入框类型
+ */
 type EditInputType = 'number' | 'text' | 'textarea' | 'date' | 'time' | 'switch'
-
-interface LogDataDetail {
+/**
+ * 日志的内结果属性
+ */
+interface LogDataDetail<T = any> extends TableData, Expandable<T> {
     content: string
     status: boolean
-    date: string
-    key: React.Key
 }
+/**
+ * 日志的数据结构
+ */
 interface LogData {
     [key: string]: LogDataDetail[]
 }
 /**
- * 设置是否可修改的 columns
- */
-interface LogDataDetailColumns<T> extends ColumnType<T> {
-    inputType?: EditInputType
-    editable?: boolean
-}
-/**
  * 日志外层 columns
  */
-interface LogDataOut {
-    createDate: string
-    key: string
+interface LogDataOut<T = any> extends TableData, Expandable<T> {
+    
 }
-
-interface LogDataDetailProps {
-    dataIndex: string
+/**
+ * ExpandableTable 中数据一定要包含的属性
+ */
+interface TableData {
+    date: string
+    key: React.Key
 }
+/**
+ * ExpandableTable 的可展开表格生成组件的 props
+ */
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement>  {
     record: LogDataDetail
     dataIndex: string
     title: string
     inputType: EditInputType
     editing: boolean
-    children: React.ReactNode;
+    childrenTable: React.ReactNode;
+}
+/**
+ * ExpandableTable 的 props
+ */
+interface TableProps<T> {
+    data: T[]
+    columns: TableColumns<T>[]
+    expendable?: boolean
+}
+/**
+ * ExpandableTable 表格列属性
+ */
+interface TableColumns<T> extends ColumnType<T> {
+    inputType?: EditInputType
+    editable?: boolean
+    columnsOperate?: TableOperate<T>[]
+}
+/**
+ * ExpandableTable 的 operate 属性参数
+ */
+interface TableOperate<T> {
+    tip: string
+    edit?: boolean
+    doubleCheck?: boolean
+    /**
+     * @param {string} text 为当前行content
+     * @param record 为当前行数据
+     */
+    onConfirm?: TableOperateConfirm<T>
+}
+/**
+ * ExpandableTable 中, operate 里按钮成功的回调函数
+ */
+type TableOperateConfirm<T> = (record: T, key: React.Key) => void
+/**
+ * 可展开表格数据的展开项相关数据
+ */
+interface Expandable<T> {
+    childrenTableData?: {
+        columns: TableColumns<T>[]
+        data: T[]
+    }
 }
 
-
-
-
-
-// 考虑提升嵌套的表格
-// 内表格和外表格结构相同, 使用 columns 控制列, 修改删除等操作通过传递 props onUpdate、onDelete 实现
-// 是否可展开通过 columns 传一个属性再加上数据数组进去, 如 expendable、children, 当数组长度为0则显示 no data, 不可展开则设置属性不可展开
-
-// 目前不能新增
-
-
-
-
-
-
-
-
-
-
-
 /**
- * log 命令显示的日志表格
+ * 获取日志数据生成表格
  */
-const LogTable: React.FC = () => {
-    // 修改状态,新增log,修改日期
-    const [data, setLogData] = useState<LogData>(localStorageGetItem('log'));
-    const [form] = Form.useForm();
+const GetLogTable: React.FC = () => {
+    const [data, setData] = useState<LogDataOut<LogDataDetail>[]>([]);
 
-    const [editingKey, setEditingKey] = useState<React.Key>('');
-    const isEditing = useCallback((row: LogDataOut) => (row.key === editingKey), [editingKey]);
+    useEffect(() => {
+        getLog()
+    }, []);
 
-
-    const deleteColumns = (key: React.Key) => {
-        // console.log(key)
-        let newLogData = { ...data };
-        delete newLogData[key]
-        localStorageSetItem('log', newLogData);
-        setLogData(localStorageGetItem('log'));
-    }
-
-
-    // 操作回调
-    const editColumns = (record: LogDataOut) => {
-        // console.log(record)
-        form.setFieldsValue({ ...record, createDate: moment(record.createDate, 'YYYY-MM-DD') });
-        setEditingKey(record.key);
-    };
-    const saveColumns = async (key: React.Key) => {
-        try {
-            console.log(key)
-            const row = (await form.validateFields()) as LogDataOut;
-            // console.log(row)
-            const date = moment(row.createDate).format('YYYY-MM-DD');
-            let newLogData = {
-                ...data
+    const getLog = () => {
+        let data = localStorageGetItem('log') as LogData;
+        const result: LogDataOut<LogDataDetail>[] = Object.keys(data).map(item => {
+            let childrenData = [...data[item]]
+            childrenData.sort((a, b) => moment(a.date, 'HH-mm-ss').valueOf() - moment(b.date, 'HH-mm-ss').valueOf())
+            return {
+                date: item, 
+                key: item,
+                childrenTableData: {
+                    columns: [
+                        { 
+                            title: '时间',
+                            dataIndex: 'date',
+                            key: 'date',
+                            width: 140,
+                            editable: true,
+                            inputType: 'time',
+                        }, { 
+                            title: '内容',
+                            dataIndex: 'content',
+                            key: 'content',
+                            editable: true,
+                            inputType: 'textarea',
+                        }, { 
+                            title: '状态', 
+                            dataIndex: 'status', 
+                            key: 'status', 
+                            width: 140, 
+                            editable: true,
+                            inputType: 'switch',
+                            render: (_: any, recordDetail: LogDataDetail) => (
+                                <span><Badge status={recordDetail.status ? 'success' : 'warning'} />{recordDetail.status ? 'Finished' : 'To do'}</span>
+                            ) 
+                        }, {
+                            title: '操作',
+                            dataIndex: 'operation',
+                            key: 'operation',
+                            align: 'center',
+                            width: 120,
+                            columnsOperate: [
+                                {
+                                    tip: '编辑',
+                                    edit: true,
+                                    onConfirm(record, key) {
+                                        // console.log(record, key, '编辑', item)
+                                        let data = localStorageGetItem('log') as LogData;
+                                        let i = data[item].findIndex(log => log.key === key);
+                                        if (i === -1) return;
+                                        let result = { ...data };
+                                        let preLog = result[item].splice(i, 1);
+                                        let newDate = moment(record.date).format('HH:mm:ss');
+                                        let newLog = { ...record, date: newDate, key: newDate }
+                                        result[item].push(newLog)
+                                        
+                                        // console.log(result)
+                                        localStorageSetItem('log', result);
+                                        getLog();
+                                    }
+                                }, {
+                                    tip: '删除',
+                                    doubleCheck: true,
+                                    onConfirm(record, key) {
+                                        // console.log(record, key, '删除', item)
+                                        let data = localStorageGetItem('log') as LogData;
+                                        let i = data[item].findIndex(log => log.key === key);
+                                        if (i === -1) return;
+                                        let result = { ...data };
+                                        // 删除
+                                        let preLog = result[item].splice(i, 1);
+                                        
+                                        localStorageSetItem('log', result);
+                                        getLog();
+                                    }
+                                }
+                            ]
+                        },
+                    ],
+                    data: childrenData
+                }
             }
-            let insideData = [...data[key]];
-            delete newLogData[key];
-            newLogData[date] = insideData;
-            // 提交修改
-            localStorageSetItem('log', newLogData);
-            setLogData(localStorageGetItem('log'));
-            setEditingKey('');
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
-        }
+        });
+        // 根据日期由进致远排序
+        result.sort((a, b) => moment(b.date, 'YYYY-MM-DD').valueOf() - moment(a.date, 'YYYY-MM-DD').valueOf());
+        setData(result);
+        return result
     }
-    const cancealColumns = () => {
-        setEditingKey('');
-    };
 
-    const columnsOut: LogDataDetailColumns<LogDataOut>[] = [
+    const columns: TableColumns<LogDataOut<LogDataDetail>>[] = [
         { 
             title: '日期', 
-            dataIndex: 'createDate', 
-            key: 'createDate',
+            dataIndex: 'date', 
+            key: 'date',
             editable: true,
             inputType: 'date',
         }, {
@@ -127,41 +205,147 @@ const LogTable: React.FC = () => {
             key: 'operation',
             width: 120,
             align: 'center',
-            render: (_: any, record: LogDataOut) => {
-              const editable = isEditing(record);
-              return editable ? (
-                <span onClick={(e) => e.stopPropagation()}>
-                    <Typography.Link onClick={() => saveColumns(record.key)} style={{ marginRight: 8 }}>
-                        保存
-                    </Typography.Link>
-                    <Popconfirm title="是否取消编辑?" okText='确认' cancelText='取消' onConfirm={cancealColumns}>
-                        <a>取消</a>
-                    </Popconfirm>
-                </span>
-              ) : (
-                <span style={{display: 'inline-block', width: '100%', textAlign: 'center'}} onClick={(e) => e.stopPropagation()}>
-                    <Typography.Link disabled={editingKey !== ''} onClick={() => editColumns(record)} style={{ marginRight: 8 }}>
-                        编辑
-                    </Typography.Link>
-                    <Popconfirm title="是否取消删除?" okText='确认' cancelText='取消' onConfirm={() => deleteColumns(record.key)}>
-                        <a style={{color: '#1890ff'}}>删除</a>
-                    </Popconfirm>
-                </span>
-              );
-            }
+            columnsOperate: [
+                {
+                    tip: '编辑',
+                    edit: true,
+                    onConfirm(record, key) {
+                        // console.log(record, key, '编辑')
+                        let data = localStorageGetItem('log');
+                        let value = data[key];
+                        let result = { ...data }
+                        delete result[key]
+                        result[moment(record.date).format('YYYY-MM-DD')] = value;
+                        // console.log(result)
+                        localStorageSetItem('log', result);
+                        getLog();
+                    }
+                }, {
+                    tip: '删除',
+                    doubleCheck: true,
+                    onConfirm(record, key) {
+                        // console.log(record, key, '删除')
+                        let data = localStorageGetItem('log');
+                        let result = { ...data }
+                        delete result[key]
+                        localStorageSetItem('log', result);
+                        getLog();
+                    }
+                }
+            ]
         }
     ]
-    const dataOut: LogDataOut[] = Object.keys(data).map(item => ({createDate: item, key: item}));
-    // 根据日期由进致远排序
-    dataOut.sort((a, b) => moment(b.createDate, 'YYYY-MM-DD').valueOf() - moment(a.createDate, 'YYYY-MM-DD').valueOf());
 
-    const mergedColumns: any = columnsOut.map(col => {
+    const expandableTableProps = {
+        data,
+        columns,
+        expendable: true
+    }
+    return <ExpandableTable<LogDataOut<LogDataDetail>> {...expandableTableProps} />
+}
+// 不知道怎么在 React.FC 中使用泛型
+/**
+ * 可展开的表格
+ */
+function ExpandableTable <T extends object & TableData,>(props: TableProps<T>)  {
+    // console.log(props)
+    const { columns, data } = props;
+    const expendable = props.expendable ?? false;
+    // // 修改状态,新增log,修改日期
+    const [form] = Form.useForm();
+
+    const [editingKey, setEditingKey] = useState<React.Key>('');
+    const isEditing = useCallback((row: T) => (row.key === editingKey), [editingKey]);
+    // doublecheck 的按钮需要在第二次确认再执行, 在第一次点击时保存最终的修改回调
+    // 因为 useState 保存函数时会自动执行一次, 所以将回调把保存在对象中
+    const [update, setUpdate] = useState<{callback?: TableOperateConfirm<T>}>();
+
+    // 操作回调
+    const editColumns = (record: T, callback?: TableOperateConfirm<T>) => {
+        // console.log(record)
+        form.setFieldsValue({ ...record, date: moment(record.date, record.date.length > 8 ? 'YYYY-MM-DD' : 'HH-mm-ss') });
+        setEditingKey(record.key);
+        setUpdate({callback});
+    };
+    const saveColumns = async (record: T) => {
+        try {
+            // console.log(record, 't')
+            const row = (await form.validateFields()) as T;
+            // console.log(row)
+            update?.callback && update.callback(row, record.key);
+            setUpdate(undefined);
+            setEditingKey('');
+        } catch (errInfo) {
+            console.log('Validate Failed:', errInfo);
+        }
+    }
+    const cancealColumns = () => {
+        setEditingKey('');
+    };
+    // 生成表格列 columns
+    const tableColumns = columns.map(column => {
+        // console.log(column)
+        let newColumn = { ...column };
+        // 有操作数组则进行 render 生成
+        let operateArr = column.columnsOperate
+        if (operateArr) {
+            let render = (_:any, record: T) => {
+                // 根据属性生成操作的按钮
+                const editable = isEditing(record);
+                return (
+                    <span onClick={(e) => e.stopPropagation()} style={{userSelect: 'none'}}>
+                            {
+                                editable ? (
+                                    <>
+                                        <Typography.Link onClick={() => saveColumns(record)} style={{ marginRight: 8 }}>
+                                            保存
+                                        </Typography.Link>
+                                        <Popconfirm title="是否取消编辑?" okText='确认' cancelText='取消' onConfirm={cancealColumns}>
+                                            <a>取消</a>
+                                        </Popconfirm>
+                                    </>
+                                ) : (
+                                    column.columnsOperate && column.columnsOperate.map(item => {
+                                        return (
+                                            <Fragment key={item.tip}>
+                                                {
+                                                    item.doubleCheck ? 
+                                                        <Popconfirm overlayStyle={{minWidth: '140px'}} title={`是否${item.tip}?`} okText='确认' cancelText='取消' onConfirm={() => item.onConfirm && item.onConfirm(record, record.key)}>
+                                                            <a style={{color: '#1890ff'}}>{item.tip}</a>
+                                                        </Popconfirm> :
+                                                        item.edit ?
+                                                            <Typography.Link disabled={editingKey !== ''} onClick={() => editColumns(record, item.onConfirm)} style={{ marginRight: 8 }}>
+                                                                {item.tip}
+                                                            </Typography.Link> :
+                                                            <Typography.Link onClick={() => item.onConfirm && item.onConfirm(record, record.key)} style={{ marginRight: 8 }}>
+                                                                {item.tip}
+                                                            </Typography.Link>
+                                                }
+                                            </Fragment>
+                                        )
+                                    })
+                                )
+                            }
+                    </span>
+                )
+            }
+            newColumn.render = render;
+        }
+        
+        return { ...newColumn }
+    })
+    // 合并表格列, 使可以进行修改
+    const mergedColumns: any = tableColumns.map(col => {
+        if (!col.render) {
+            col.render = (text) => (<div className={css.table_row}>{text}</div>)
+        }
         if (!col.editable) {
+            // console.log(col)
             return col;
         }
         return {
             ...col,
-            onCell: (record: LogDataOut) => ({
+            onCell: (record: T) => ({
                 record,
                 dataIndex: col.dataIndex,
                 title: col.title,
@@ -171,11 +355,14 @@ const LogTable: React.FC = () => {
         }
     });
 
-    const expandedRowRender = (record: LogDataOut) => {
+    // 根据可展开元素 table 数据生成 table
+    const expandedRowRender = (record: T & Expandable<T>) => {
+        // console.log(record)
+        if (record.childrenTableData) {
+            return <ExpandableTable<T> {...record.childrenTableData} />
+        }
         return (
-            <LogDetailTable 
-                dataIndex={record.createDate} 
-            />
+            <></>
         )
     }
     
@@ -183,16 +370,16 @@ const LogTable: React.FC = () => {
         <Form component={false} form={form}>
             <Table 
                 columns={mergedColumns}
-                expandable={{ 
+                expandable={expendable ? { 
                     expandedRowRender,
                     expandRowByClick: editingKey === '',
-                }}
+                } : undefined}
                 components={{
                     body: {
                         cell: EditableCell,
                     },
                 }}
-                dataSource={dataOut}
+                dataSource={data}
                 pagination={{
                     pageSize: 10
                 }}
@@ -200,182 +387,10 @@ const LogTable: React.FC = () => {
         </Form>
     )
 }
-
-/**
- * 嵌套表格组件
- */
-const LogDetailTable: React.FC<LogDataDetailProps> = ({dataIndex}) => {
-    const [logData, setLogData] = useState<LogData>(localStorageGetItem('log'));
-    const data = useMemo(() => logData[dataIndex], [dataIndex, logData])
-    const [form] = Form.useForm()
-    
-    // 正在进行修改的行key值
-    const [editingKey, setEditingKey] = useState<React.Key>('');
-    // 是否可以进行修改
-    const isEditing = useCallback((row: LogDataDetail) => (row.key === editingKey), [editingKey]);
-
-    // 操作回调
-    const saveColumns = async (key: React.Key) => {
-        try {
-            const row = (await form.validateFields()) as LogDataDetail;
-            // console.log(row)
-            const inputDate = row.date;
-            const date = moment(inputDate).format('YYYY-MM-DD');
-            const time = moment(inputDate).format('HH:mm:ss');
-            // console.log(date, time)
-            let newLogData = {
-                ...logData
-            }
-            const newData = {
-                key: time,
-                date: time,
-                content: row.content,
-                status: row.status,
-            }
-            // 提交数据是否已存在
-            if (newLogData[date]) {
-                let logDetailData = newLogData[date];
-                let getSameDataIndex = logDetailData.findIndex(log => log.key === time);
-                // 存在相同时间(key)进行覆盖
-                if (getSameDataIndex !== -1) {
-                    logDetailData[getSameDataIndex] = newData;
-                }
-                // 没有相同时间(key)进行新增
-                else {
-                    logDetailData.push(newData)
-                }
-            }
-            // 提交数据不存在
-            else {
-                newLogData[`${date}`] = [
-                    ...logData[date], 
-                    newData
-                ]
-            }
-            // 数据更新
-            // console.log(newLogData)
-            localStorageSetItem('log', newLogData);
-            // console.log(localStorageGetItem('log'))
-            setLogData(localStorageGetItem('log'))
-            setEditingKey('');
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
-        }
-    }
-    const editColumns = (recordDetail: LogDataDetail) => {
-        // console.log(recordDetail)
-        form.setFieldsValue({ ...recordDetail, date: moment(`${dataIndex} ${recordDetail.date}`) });
-        setEditingKey(recordDetail.key);
-    };
-    const cancealColumns = () => {
-        setEditingKey('');
-    };
-    const deleteColumns = (key: React.Key) => {
-        const newLogData = { ...logData }
-        const delIndex = newLogData[dataIndex].findIndex(log => log.key === key);
-        if (delIndex !== -1) {
-            newLogData[dataIndex].splice(delIndex, 1);
-        }
-        // console.log(delIndex, newLogData)
-        localStorageSetItem('log', newLogData);
-        setLogData(localStorageGetItem('log'));
-    };
-
-    // 嵌套内表格columns, editable标注是否可编辑, inputType标注编辑框为什么类型input
-    const columnsDetail: LogDataDetailColumns<LogDataDetail>[] = [
-        { 
-            title: '时间',
-            dataIndex: 'date',
-            key: 'date',
-            width: 140,
-            editable: true,
-            inputType: 'time',
-        }, { 
-            title: '内容',
-            dataIndex: 'content',
-            key: 'content',
-            editable: true,
-            inputType: 'textarea',
-        }, { 
-            title: '状态', 
-            dataIndex: 'status', 
-            key: 'status', 
-            width: 140, 
-            editable: true,
-            inputType: 'switch',
-            render: (_: any, recordDetail: LogDataDetail) => (
-                <span><Badge status={recordDetail.status ? 'success' : 'warning'} />{recordDetail.status ? 'Finished' : 'To do'}</span>
-            ) 
-        }, {
-            title: '操作',
-            dataIndex: 'operation',
-            key: 'operation',
-            align: 'center',
-            width: 120,
-            render: (_: any, recordDetail: LogDataDetail) => {
-              const editable = isEditing(recordDetail);
-              return editable ? (
-                <span>
-                    <Typography.Link onClick={() => saveColumns(recordDetail.key)} style={{ marginRight: 8 }}>
-                        保存
-                    </Typography.Link>
-                    <Popconfirm title="是否取消编辑?" okText='确认' cancelText='取消' onConfirm={cancealColumns}>
-                        <a>取消</a>
-                    </Popconfirm>
-                </span>
-              ) : (
-                <span style={{display: 'inline-block', width: '100%', textAlign: 'center'}}>
-                    <Typography.Link disabled={editingKey !== ''} onClick={() => editColumns(recordDetail)} style={{ marginRight: 8 }}>
-                        编辑
-                    </Typography.Link>
-                    <Typography.Link onClick={() => deleteColumns(recordDetail.key)}>
-                        删除
-                    </Typography.Link>
-                </span>
-              );
-            },
-        },
-    ];
-    // 与 form 编辑 columns 合并, onCell 中返回的对象为 EditableCell 中接收的 props
-    // 不使用 any 会导致 table 的 columns 属性报错
-    const mergedColumns: any = columnsDetail.map(col => {
-        if (!col.editable) {
-            return col;
-        }
-        return {
-            ...col,
-            onCell: (record: LogDataDetail) => ({
-                record,
-                dataIndex: col.dataIndex,
-                title: col.title,
-                inputType: col.inputType,
-                editing: isEditing(record),
-            })
-        }
-    })
-
-    return (
-        <Form component={false} form={form}>
-            <Table 
-                dataSource={data} 
-                components={{
-                    body: {
-                        cell: EditableCell,
-                    },
-                }}
-                columns={mergedColumns} 
-                pagination={{
-                    pageSize: 6
-                }}
-            />
-        </Form>
-    )
-}
-
 /**
  * 表格点击编辑后出现的 form
  */
-const EditableCell: React.FC<EditableCellProps> = (props) => {
+ const EditableCell: React.FC<EditableCellProps> = (props) => {
     const {
         record,
         dataIndex,
@@ -452,7 +467,9 @@ const EditableCell: React.FC<EditableCellProps> = (props) => {
     )
 }
 
+
+
 export {
-    LogTable,
-    LogDetailTable
+    GetLogTable,
+    ExpandableTable
 }

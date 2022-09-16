@@ -1,0 +1,4 @@
+.table_row {
+    max-height: 150px;
+    overflow-y: auto;
+}

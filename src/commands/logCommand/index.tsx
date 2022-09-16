@@ -1,6 +1,6 @@
 
 import { Command } from "../../interface/interface";
-import { LogTable } from "./logCommandOutput";
+import { GetLogTable } from "./logCommandOutput";
 
 
 
@@ -13,7 +13,7 @@ const command: Command = {
     action(args, commandHandle) {
         // console.log(args);
         
-        return <LogTable key={`log result ${new Date().getTime()}`} />
+        return <GetLogTable key={`log result ${new Date().getTime()}`} />
     }
 }
 
