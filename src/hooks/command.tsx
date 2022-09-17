@@ -65,7 +65,7 @@ const useCommand = (): UseCommandHook => {
         setCommands(commands => {
             // console.log(commands)
             return [...commands, {
-                construct: <div className={className} onClick={(e) => e.stopPropagation()}>{command}</div>,
+                construct: <div className={className}>{command}</div>,
                 key, isResult
             }]
         });

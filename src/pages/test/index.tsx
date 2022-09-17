@@ -1,13 +1,11 @@
 import originAxios from "axios";
-import { useEffect, useState } from "react";
-import { getTest } from "../../assets/js/api";
-import { command } from "../../commands/backgroundCommand";
-import useBackgroundImage from "../../hooks/backgroundImage";
+import { useEffect } from "react";
+
+
 const axios = originAxios.create({
     baseURL: process.env.NODE_ENV === 'development' ? '/bili': '/'
 });
 
-axios.defaults.withcredentials = true;
 
 function Test() {
     
@@ -19,10 +17,6 @@ function Test() {
 
     async function getData() {
 
-        // getTest()
-        // .then(res => {
-        //     console.log(res)
-        // })        
 
         // await fetch('https://api.bilibili.com/x/frontend/finger/spi',
         // {  
@@ -60,9 +54,7 @@ function Test() {
     return (
         <div>
             test
-            <input onKeyDown={() => {
-                console.log('wfwf')
-            }} />
+            
         </div>
     )
 }

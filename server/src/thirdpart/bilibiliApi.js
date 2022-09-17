@@ -3,7 +3,6 @@ const { default: axios } = require("axios")
 
 const biliSearch = async ({keywords, page, pageSize = 42}) => {
 
-    // const cookie = `buvid3=5DAF93F9-CEDA-494C-A66D-4C848E9AC2C0148803infoc;`
     const cookie = await axios.get(`https://api.bilibili.com/x/frontend/finger/spi`)
     .then(data => `buvid3=${data.data.data.b_3};`);
     // console.log(keywords)
@@ -29,7 +28,6 @@ const biliSearch = async ({keywords, page, pageSize = 42}) => {
 // b站搜索登录用户和未登录用户搜索结果是不同的, 登录用户会传递 cookie 中的 SESSDATA, 此 cookie 控制搜索结果
 const biliSearchType = async ({keywords, page, pageSize = 42, search_type}) => {
     
-    // const cookie = `buvid3=5DAF93F9-CEDA-494C-A66D-4C848E9AC2C0148803infoc;`
     const cookie = await axios.get(`https://api.bilibili.com/x/frontend/finger/spi`)
     .then(data => `buvid3=${data.data.data.b_3};`);
 

@@ -10,7 +10,7 @@ import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo } from "../../interface/i
 
 const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: UseCommandHook) => {
     // console.log(data)
-    // 根据类型筛查展示结果
+    // 根据 typeStr 进行组件筛选, 显示不同的搜索结果
 
     return <BiliVideoList key={`bili search result ${typeStr} ${new Date().getTime()}`} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
 }
@@ -20,8 +20,15 @@ interface BiliVideoListProps {
     commandHandle: UseCommandHook
     typeStr: string
 }
-// 找不到bilibili 的搜索结果数量,只能拿结果中的
+// bilibili 的搜索结果根据屏幕显示改变
 const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
+    /** 
+     * 最少一行4个视频, 全部都有6行
+     * 一行4个时,显示42页
+     * 一行5个时,显示34页
+     * 一行6个时,显示28页
+     * 一行7个时,显示24页
+     */
     const { keywords, commandHandle, typeStr } = props;
 
     const [loading, setLoading] = useState(true);
@@ -35,27 +42,6 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
     const [pageNum, setPageNum] = useState(1);
     const [pageSize, setPageSize] = useState(24);
     const [searchType, setSearchType] = useState(typeStr);
-
-    // 获取所有类型的搜索数据结果
-    // const getSearchResult = useCallback(async (page) => {
-    //     setLoading(true)
-    //     const result = await getBiliSearchResult({keywords, page, pageSize})
-    //     // console.log(result, typeStr)
-    //     const result.data = result.data.data.result.find(item => item.result_type === typeStr)
-    //     // console.log(listData)
-    //     if (!listData) {
-    //         setData([]);
-    //     }
-    //     else {
-    //         setData(listData.data);
-    //     }
-    //     setLoading(false);
-    //     setDataInfo(result.data.data.pageinfo[typeStr]);
-    // }, [keywords, typeStr]);
-    
-    // useEffect(() => {
-    //     getSearchResult(pageNum);
-    // }, [getSearchResult, pageNum]);
 
     // 获取某类型的搜索结果
     const getVideoSearchResult = useCallback(async (toPage: number) => {

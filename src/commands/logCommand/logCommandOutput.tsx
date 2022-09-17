@@ -8,9 +8,6 @@ import css from './index.module.css'
 
 
 
-
-// 目前不能新增
-
 /**
  * 可修改的输入框类型
  */
@@ -55,7 +52,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement>  {
 /**
  * ExpandableTable 的 props
  */
-interface TableProps<T> extends Partial<{ style?: React.CSSProperties }> {
+interface TableProps<T = any> extends Partial<{ style?: React.CSSProperties }> {
     data: T[]
     columns: TableColumns<T>[]
     expendable?: boolean
@@ -105,6 +102,10 @@ const GetLogTable: React.FC = () => {
     // 获取日志数据并生成表格数据
     const getLog = () => {
         let data = localStorageGetItem('log') as LogData;
+        if (!data) {
+            localStorageSetItem('log', {})
+            return {}
+        }
         const result: LogDataOut<LogDataDetail>[] = Object.keys(data).map(key => {
             let childrenData = [...data[key]]
             childrenData.sort((a, b) => moment(a.date, 'HH-mm-ss').valueOf() - moment(b.date, 'HH-mm-ss').valueOf())
@@ -146,10 +147,10 @@ const GetLogTable: React.FC = () => {
                                 {
                                     tip: '编辑',
                                     edit: true,
-                                    onConfirm(record, key) {
-                                        // console.log(record, key, '编辑', key)
+                                    onConfirm(record, insideKey) {
+                                        // console.log(record, key, '编辑', insideKey)
                                         let data = localStorageGetItem('log') as LogData;
-                                        let i = data[key].findIndex(log => log.key === key);
+                                        let i = data[key].findIndex(log => log.key === insideKey);
                                         if (i === -1) return;
                                         let result = { ...data };
                                         let preLog = result[key].splice(i, 1);
@@ -164,15 +165,16 @@ const GetLogTable: React.FC = () => {
                                 }, {
                                     tip: '删除',
                                     doubleCheck: true,
-                                    onConfirm(record, key) {
-                                        // console.log(record, key, '删除', key)
+                                    onConfirm(record, insideKey) {
+                                        // console.log(record, key, '删除', insideKey)
                                         let data = localStorageGetItem('log') as LogData;
-                                        let i = data[key].findIndex(log => log.key === key);
+                                        let i = data[key].findIndex(log => log.key === insideKey);
                                         if (i === -1) return;
                                         let result = { ...data };
                                         // 删除
                                         let preLog = result[key].splice(i, 1);
                                         
+                                        // console.log(result)
                                         localStorageSetItem('log', result);
                                         getLog();
                                     }
@@ -289,11 +291,11 @@ const GetLogTable: React.FC = () => {
     }
     return <ExpandableTable<LogDataOut<LogDataDetail>> {...expandableTableProps} />
 }
-// 不知道怎么在 React.FC 中使用泛型
+// React.FC 无法实现泛型
 /**
  * 可展开的表格
  */
-function ExpandableTable <T extends object & TableData,>(props: TableProps<T>)  {
+const ExpandableTable = <T extends object & TableData,>(props: TableProps<T>) => {
     // console.log(props)
     const { columns, data, addColumn, style } = props;
     const expendable = props.expendable ?? false;
@@ -414,7 +416,7 @@ function ExpandableTable <T extends object & TableData,>(props: TableProps<T>)  
     
     
     return (
-        <div className={css.table_wrapper} style={style}>
+        <div className={css.table_wrapper} style={style} onClick={e => e.stopPropagation()}>
             <Form component={false} form={form}>
                 <Table 
                     columns={mergedColumns}
