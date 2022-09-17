@@ -1,4 +1,4 @@
-import { Badge, DatePicker, Form, Input, InputNumber, Popconfirm, Switch, Table, TimePicker, Typography } from "antd";
+import { Badge, DatePicker, Form, Input, InputNumber, Popconfirm, Switch, Table, TimePicker, Typography, Button, message } from "antd";
 import React, { useEffect, useMemo, useCallback, useState, Fragment } from "react";
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 import moment from 'moment'
@@ -55,10 +55,11 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement>  {
 /**
  * ExpandableTable 的 props
  */
-interface TableProps<T> {
+interface TableProps<T> extends Partial<{ style?: React.CSSProperties }> {
     data: T[]
     columns: TableColumns<T>[]
     expendable?: boolean
+    addColumn?: (pageData: T[]) => any
 }
 /**
  * ExpandableTable 表格列属性
@@ -89,10 +90,7 @@ type TableOperateConfirm<T> = (record: T, key: React.Key) => void
  * 可展开表格数据的展开项相关数据
  */
 interface Expandable<T> {
-    childrenTableData?: {
-        columns: TableColumns<T>[]
-        data: T[]
-    }
+    childrenTableData?: TableProps<T>
 }
 
 /**
@@ -104,15 +102,15 @@ const GetLogTable: React.FC = () => {
     useEffect(() => {
         getLog()
     }, []);
-
+    // 获取日志数据并生成表格数据
     const getLog = () => {
         let data = localStorageGetItem('log') as LogData;
-        const result: LogDataOut<LogDataDetail>[] = Object.keys(data).map(item => {
-            let childrenData = [...data[item]]
+        const result: LogDataOut<LogDataDetail>[] = Object.keys(data).map(key => {
+            let childrenData = [...data[key]]
             childrenData.sort((a, b) => moment(a.date, 'HH-mm-ss').valueOf() - moment(b.date, 'HH-mm-ss').valueOf())
             return {
-                date: item, 
-                key: item,
+                date: key, 
+                key: key,
                 childrenTableData: {
                     columns: [
                         { 
@@ -149,15 +147,15 @@ const GetLogTable: React.FC = () => {
                                     tip: '编辑',
                                     edit: true,
                                     onConfirm(record, key) {
-                                        // console.log(record, key, '编辑', item)
+                                        // console.log(record, key, '编辑', key)
                                         let data = localStorageGetItem('log') as LogData;
-                                        let i = data[item].findIndex(log => log.key === key);
+                                        let i = data[key].findIndex(log => log.key === key);
                                         if (i === -1) return;
                                         let result = { ...data };
-                                        let preLog = result[item].splice(i, 1);
+                                        let preLog = result[key].splice(i, 1);
                                         let newDate = moment(record.date).format('HH:mm:ss');
                                         let newLog = { ...record, date: newDate, key: newDate }
-                                        result[item].push(newLog)
+                                        result[key].push(newLog)
                                         
                                         // console.log(result)
                                         localStorageSetItem('log', result);
@@ -167,13 +165,13 @@ const GetLogTable: React.FC = () => {
                                     tip: '删除',
                                     doubleCheck: true,
                                     onConfirm(record, key) {
-                                        // console.log(record, key, '删除', item)
+                                        // console.log(record, key, '删除', key)
                                         let data = localStorageGetItem('log') as LogData;
-                                        let i = data[item].findIndex(log => log.key === key);
+                                        let i = data[key].findIndex(log => log.key === key);
                                         if (i === -1) return;
                                         let result = { ...data };
                                         // 删除
-                                        let preLog = result[item].splice(i, 1);
+                                        let preLog = result[key].splice(i, 1);
                                         
                                         localStorageSetItem('log', result);
                                         getLog();
@@ -182,7 +180,8 @@ const GetLogTable: React.FC = () => {
                             ]
                         },
                     ],
-                    data: childrenData
+                    data: childrenData,
+                    addColumn: addLogEvent.bind(this, key)
                 }
             }
         });
@@ -191,7 +190,7 @@ const GetLogTable: React.FC = () => {
         setData(result);
         return result
     }
-
+    // 表格列
     const columns: TableColumns<LogDataOut<LogDataDetail>>[] = [
         { 
             title: '日期', 
@@ -236,10 +235,57 @@ const GetLogTable: React.FC = () => {
         }
     ]
 
+    // 添加日志的日期
+    const addLogDay = (columns: LogDataOut[]) => {
+        let date = moment().format('YYYY-MM-DD');
+        let data = localStorageGetItem('log')
+        if (data[date]) {
+            do {
+                date = moment(moment(date, 'YYYY-MM-DD').valueOf() + (24* 3600 * 1000)).format('YYYY-MM-DD');
+            } while(data[date])
+            console.log('当前日期存在', date)
+        }
+        let newData = { ...data }
+        newData[date] = [];
+        localStorageSetItem('log', {...newData});
+        // console.log(columns)
+        getLog();
+    }
+    // 添加日志日期中的事件
+    const addLogEvent = (key: string, columns: LogDataOut[]) => {
+        let time = moment().format('HH:mm:ss')
+        let data: LogData = localStorageGetItem('log');
+        let newData = { ...data };
+        let updateLogData = [...newData[key]]
+        if (updateLogData.find(log => log.key === time)) {
+            do {
+                if (time === '23:59:59') {
+                    message.error('你之后的时间已经排满了');
+                    return;
+                }
+                // console.log(moment(moment(time, 'HH:mm:ss').valueOf() + 1000).format('HH:mm:ss'), time)
+                time = moment(moment(time, 'HH:mm:ss').valueOf() + 1000).format('HH:mm:ss');
+            } while(updateLogData.find(log => log.key === time))
+        }
+        // console.log(key, columns);
+        updateLogData.push({
+            key: time,
+            date: time,
+            content: '日志内容',
+            status: false
+        })
+        newData[key] = [...updateLogData]
+        // console.log(newData)
+        localStorageSetItem('log', { ...newData });
+        getLog();
+
+    }
+
     const expandableTableProps = {
         data,
         columns,
-        expendable: true
+        expendable: true,
+        addColumn: addLogDay
     }
     return <ExpandableTable<LogDataOut<LogDataDetail>> {...expandableTableProps} />
 }
@@ -249,7 +295,7 @@ const GetLogTable: React.FC = () => {
  */
 function ExpandableTable <T extends object & TableData,>(props: TableProps<T>)  {
     // console.log(props)
-    const { columns, data } = props;
+    const { columns, data, addColumn, style } = props;
     const expendable = props.expendable ?? false;
     // // 修改状态,新增log,修改日期
     const [form] = Form.useForm();
@@ -359,38 +405,56 @@ function ExpandableTable <T extends object & TableData,>(props: TableProps<T>)  
     const expandedRowRender = (record: T & Expandable<T>) => {
         // console.log(record)
         if (record.childrenTableData) {
-            return <ExpandableTable<T> {...record.childrenTableData} />
+            return <ExpandableTable<T> style={{marginLeft: '20px'}} {...record.childrenTableData} />
         }
         return (
             <></>
         )
     }
     
+    
     return (
-        <Form component={false} form={form}>
-            <Table 
-                columns={mergedColumns}
-                expandable={expendable ? { 
-                    expandedRowRender,
-                    expandRowByClick: editingKey === '',
-                } : undefined}
-                components={{
-                    body: {
-                        cell: EditableCell,
-                    },
-                }}
-                dataSource={data}
-                pagination={{
-                    pageSize: 10
-                }}
-            />
-        </Form>
+        <div className={css.table_wrapper} style={style}>
+            <Form component={false} form={form}>
+                <Table 
+                    columns={mergedColumns}
+                    expandable={expendable ? { 
+                        expandedRowRender,
+                        expandRowByClick: editingKey === '',
+                    } : undefined}
+                    components={{
+                        body: {
+                            cell: EditableCell,
+                        },
+                    }}
+                    dataSource={data}
+                    pagination={{
+                        style: {marginRight: '30px'},
+                        showSizeChanger: false,
+                        pageSize: 10
+                    }}
+                    title={(pageData) => {
+                        // console.log(pageData)
+                        {/* 新增行按钮 */}
+                        return (
+                            <div className={css.table_out_header}>
+                                {
+                                    addColumn ? 
+                                        <Button onClick={() => {addColumn(pageData as T[])}} type="primary">新增</Button> :
+                                        ''
+                                }
+                            </div>
+                        )
+                    }}
+                />
+            </Form>
+        </div>
     )
 }
 /**
  * 表格点击编辑后出现的 form
  */
- const EditableCell: React.FC<EditableCellProps> = (props) => {
+const EditableCell: React.FC<EditableCellProps> = (props) => {
     const {
         record,
         dataIndex,
