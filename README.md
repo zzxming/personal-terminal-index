@@ -6,6 +6,9 @@
 
 # 项目启动
 
+```
+- https://gitee.com/zzxming77/personal-terminal.git
+
 - 后端启动
 
     1. cd personal-terminal
@@ -17,6 +20,7 @@
     1. cd personal-terminal
     2. npm run start
 
+```
 
 # 项目命令
 
