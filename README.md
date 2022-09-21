@@ -6,6 +6,9 @@
 
 # 项目启动
 
+```
+- git clone https://gitee.com/zzxming77/personal-terminal.git
+
 - 后端启动
 
     1. cd personal-terminal
@@ -17,6 +20,7 @@
     1. cd personal-terminal
     2. npm run start
 
+```
 
 # 项目命令
 
@@ -25,3 +29,4 @@
 如想要使用 ```fanyi``` 命令需要后端配置百度翻译的 ```appid``` 与 ```key``` , 申请方式见[百度翻译开发平台](https://api.fanyi.baidu.com/product/11).
 
 
+    

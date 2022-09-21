@@ -64,11 +64,15 @@ const command: Command = {
     ],
     async action(args, commandHandle) {
         // console.log(args)
-        let { _, to, from } = args;
+        let { _, to: toArg, from: fromArg } = args as { _: string[], to: string, from: string };
         const keywords = _.join(' ');
         
         // console.log(param, to, from)
-        const result = await fanyiApi({ keywords, to: to as string, from: from as string });
+        const [err, result] = await fanyiApi({ keywords, to: toArg, from: fromArg });
+        if (err) {
+            // console.log(err)
+            return err.response?.statusText || err.message
+        }
         // console.log(result)
         const data = result.data.data;
         // console.log(data)
@@ -77,7 +81,7 @@ const command: Command = {
             // console.log(data.error_msg);
             return (
                 <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
-                    error code：{error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
+                    error code: {error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
                 </div>
             )
         }
@@ -85,7 +89,7 @@ const command: Command = {
             const { trans_result, to, from } = data as FanyiResResult;
             return (
                 <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
-                    从{lang[from]}：{trans_result[0].src}，翻译成{lang[to]}：{trans_result[0].dst}
+                    从{lang[from]}: {trans_result[0].src}，翻译成{lang[to]}: {trans_result[0].dst}
                 </div>
             );
         }

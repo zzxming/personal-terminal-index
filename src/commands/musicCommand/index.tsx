@@ -6,6 +6,8 @@ import {
     MusicResult,
 } from '../../assets/js/api'
 import { Command } from '../../interface/interface';
+import { AxiosError } from 'axios';
+
 
 const command: Command = {
     name: 'music',
@@ -45,7 +47,7 @@ const command: Command = {
 
         // 0请求歌单,2请求歌曲
         const musicRequestOption: {
-            [key: string]: { type: number; func: (keywords: any) => Promise<AxiosResult<MusicResult[]>>; height: number; }
+            [key: string]: { type: number; func: (keywords: any) => Promise<[AxiosError | null, AxiosResult<MusicResult[]> | undefined]>; height: number; }
         } = {
             0: { type: 0, func: getNeteaseMusicList, height: 450 },
             2: { type: 2, func: getNeteaseMusic, height: 110 }
@@ -54,13 +56,19 @@ const command: Command = {
         let urlid: string | number = keywords;
         // 没有id搜索,正常关键字搜索
         if (!id) {
-            const result = await getTypeOption.func(keywords);
-            // console.log(result)
-            const songs = result.data.data;
-            if (songs.length < 1) {
-                return 'Not Found';
+            const [err, result] = await getTypeOption.func(keywords);
+            if (err) {
+                // console.log(err)
+                return err.response?.statusText || err.message
             }
-            urlid = songs[0].id;
+            else if (result) {
+                // console.log(result)
+                const songs = result.data.data;
+                if (songs.length < 1) {
+                    return 'Not Found';
+                }
+                urlid = songs[0].id;
+            }
         }
 
         let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${getTypeOption.height - 20}`;

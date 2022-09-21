@@ -1,4 +1,5 @@
-import originAxios from 'axios';
+import to from 'await-to-js';
+import originAxios, { AxiosError } from 'axios';
 import { BiliPageInfo, BiliTypeVideo, BiliVideo, BiliVideoSearchInfo } from '../../interface/interface';
 
 export const axios = originAxios.create({
@@ -39,7 +40,9 @@ export interface FanyiRejResult {
     error_code: number
     error_message: string
 }
-export const fanyiApi = async (config: FanyiConfig): Promise<AxiosResult<FanyiResResult | FanyiRejResult>> => await axios.post('/fanyi/translate', { config })
+
+export const fanyiApi = async (config: FanyiConfig) => 
+    await to<AxiosResult<FanyiResResult | FanyiRejResult>, AxiosError>(axios.post('/fanyi/translate', { config }))
 
 
 export interface MusicResult {
@@ -47,9 +50,11 @@ export interface MusicResult {
     id: number
 }
 /** 关键词搜索单曲 */
-export const getNeteaseMusic = async (keywords: string): Promise<AxiosResult<MusicResult[]>> => await axios.post('/music/get', { keywords });
+export const getNeteaseMusic = async (keywords: string) => 
+    await to<AxiosResult<MusicResult[]>, AxiosError>(axios.post('/music/get', { keywords }));
 /** 关键词搜索歌单 */
-export const getNeteaseMusicList = async (keywords: string): Promise<AxiosResult<MusicResult[]>> => await axios.post('/music/list', { keywords });
+export const getNeteaseMusicList = async (keywords: string) => 
+    await to<AxiosResult<MusicResult[]>, AxiosError>(axios.post('/music/list', { keywords }));
 
 /**
  * 
@@ -57,7 +62,8 @@ export const getNeteaseMusicList = async (keywords: string): Promise<AxiosResult
  * @returns imageurl
  */
 export type ImageType = ['meizi', 'dongman', 'fengjing', 'suiji']
-export const getBackgroundImageUrl = async (type: ImageType) => await axios.get('/background/random', { params: { type } });
+export const getBackgroundImageUrl = async (type: ImageType) => 
+    await to<AxiosResult<string>, AxiosError>(axios.get('/background/random', { params: { type } }));
 
 /**
  * bilibili搜索
@@ -79,8 +85,12 @@ export interface BiliSearchResult {
         data: BiliVideo[]
     }[]
 }
-export const getBiliSearchResult = async (params: BiliSearchParam): Promise<AxiosResult<BiliSearchResult>> => await axios.get('/bili/search', { params })
-export const getBiliPic = async (pic: string) => await axios.get('/bili/pic', { params: { pic } })
+/** bilibili搜索 */
+export const getBiliSearchResult = async (params: BiliSearchParam) => 
+    await to<AxiosResult<BiliSearchResult>, AxiosError>(axios.get('/bili/search', { params }));
+/** 获取bilibili图片 */
+export const getBiliPic = async (pic: string) => 
+    await to<AxiosResult<string>, AxiosError>(axios.get('/bili/pic', { params: { pic } }));
 
 /**
  * 
@@ -94,6 +104,7 @@ interface BiliTypeSearchParam extends BiliSearchParam {
 export interface BiliTypeSearchResult extends BiliVideoSearchInfo {
     result: BiliTypeVideo[]
 }
-// 搜索结果的信息
-export const getBiliSearchTypeResult = async (params: BiliTypeSearchParam): Promise<AxiosResult<BiliTypeSearchResult>> => await axios.get('/bili/searchtype', { params })
+/** 根据类型搜索结果 */
+export const getBiliSearchTypeResult = async (params: BiliTypeSearchParam) => 
+    await to<AxiosResult<BiliTypeSearchResult>, AxiosError>(axios.get('/bili/searchtype', { params }));
 

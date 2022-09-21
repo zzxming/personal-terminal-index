@@ -34,7 +34,11 @@ const command: Command = {
             return '更换成功';
         }
 
-        const result = await getBackgroundImageUrl(type as ImageType);
+        const [err, result] = await getBackgroundImageUrl(type as ImageType);
+        if (err) {
+            // console.log(err)
+            return err.response?.statusText || err.message
+        }
         if (result.data.data === '') {
             return '请求失败';
         }

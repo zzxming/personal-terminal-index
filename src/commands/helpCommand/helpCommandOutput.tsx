@@ -49,7 +49,7 @@ const commandDetail = (command: Command) => {
         }
         // console.log(dataSource)
         // console.log(columns)
-        return (<Table pagination={false} dataSource={dataSource} columns={columns}  scroll={{ y: 240 }} />)
+        return (<Table pagination={false} dataSource={dataSource} columns={columns} scroll={{ y: 240 }} style={{overflowY: 'auto'}} />)
     }
     
     return (

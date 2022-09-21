@@ -1,9 +1,9 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { getBiliPic, getBiliSearchTypeResult } from "../../assets/js/api";
-import { BiliVideoIframe } from "./biliVideoOutput";
-import style from './index.module.css'
 import { Pagination, PaginationProps } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
+import { BiliVideoIframe } from "./biliVideoOutput";
+import style from './index.module.css'
 import ALink from "../../components/noRouteALink";
 import { UseCommandHook } from "../../hooks/command";
 import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo } from "../../interface/interface";
@@ -49,7 +49,11 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
         
         // console.log(await getBiliSearchResult({keywords, page: toPage, pageSize}))
 
-        const result = await getBiliSearchTypeResult({keywords, page: toPage, pageSize, search_type: searchType})
+        const [err, result] = await getBiliSearchTypeResult({keywords, page: toPage, pageSize, search_type: searchType});
+        if (err) {
+            // console.log(err)
+            return err.response?.statusText || err.message
+        }
         // console.log(result)
         const { numPages, numResults, pagesize, page, result: datalist } = result.data.data;
         if (!datalist) {
@@ -135,7 +139,7 @@ const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
     // arcurl是b站视频地址, mid为up主uid, 
     const {pic, bvid, play, id, danmaku, title, author, senddate, duration, arcurl, mid} = props.data;
     
-    const [base64pic, setBase64Pic] = useState();
+    const [base64pic, setBase64Pic] = useState<string>();
     const [videoTextTitle] = useState(keywordsFormatStr(title));
     const [videoJSXTitle] = useState(keywordsFormat(title));
     const [videoTextPlay] = useState(formatNumber(play));
@@ -145,9 +149,15 @@ const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
     
     // 获取视频封面
     const getVideoPic = useCallback(async () => {
-        let result = await getBiliPic(pic);
-        // console.log(result)
-        setBase64Pic(result.data.data);
+        let [err, result] = await getBiliPic(pic);
+        if (err) {
+            // console.log(err)
+            return err.response?.statusText || err.message
+        }
+        else if (result) {
+            // console.log(result)
+            setBase64Pic(result.data.data);
+        }
     }, [pic]);
 
     useEffect(() => {
