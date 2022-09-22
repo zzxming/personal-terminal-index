@@ -37,15 +37,17 @@ const lang: {
     iku: '伊努克提图特语', ir: '伊朗语', yue: '粤语', zaz: '扎扎其语', frm: '中古法语', zul: '祖鲁语', jav: '爪哇语'
 }
 
-const command: Command = {
+const fanyiCommand: Command = {
     name: 'fanyi',
     desc: '百度翻译',
-    param: {
-        key: 'keywords',
-        desc: '要翻译的内容',
-        required: true
-    },
-    option: [
+    params: [
+        {
+            key: 'keywords',
+            desc: '要翻译的内容',
+            required: true
+        }
+    ],
+    options: [
         {
             key: 'from',
             alias: 'f',
@@ -97,7 +99,7 @@ const command: Command = {
 }
 
 export {
-    command
+    fanyiCommand
 }
 
 

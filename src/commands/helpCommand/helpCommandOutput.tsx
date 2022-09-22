@@ -30,10 +30,10 @@ const commandDetail = (command: Command) => {
         return '命令不存在';
     }
     
-    const { name, desc, param, option } = command;
+    const { name, desc, params, options } = command;
 
     // 考虑一行展示两个参数, 即 '参数 描述 参数 描述'
-    const legalTable = (legalValue: legalValueType<CommandOption<any>, 'legalValue'>) => {
+    const legalTable = (legalValue: legalValueType<CommandOption, 'legalValue'>) => {
         if (!legalValue) return ('');
         const columns: TableColumnsType<LegalValueTable> = [
             { title: '参数', dataIndex: 'key' },
@@ -57,26 +57,30 @@ const commandDetail = (command: Command) => {
             <p className={css.command_list_txt}>命令: {desc}</p>
             <p className={css.command_list_txt}>用法: {commandUseFunc(command)}</p>
             {
-                param ? 
+                params.length > 0 ? 
                     <div>
                         <p className={css.command_list_txt}>参数: </p>
                         <ul className={css.command_option_list}>
-                            <li>{param.key} {param.required ? '必填' : '可选'} {param.desc}</li>
+                            {
+                                params.map(param => (
+                                    <li>{param.key} {param.required ? '必填' : '可选'} {param.desc}</li>
+                                ))
+                            }
                         </ul>
                     </div> : 
                     ''
             }
             
             {
-                option.length > 0 ? 
+                options.length > 0 ? 
                     <div>
                         <p className={css.command_list_txt}>选项: </p>
                         <ul className={css.command_option_list}>
                             {
-                                option.map(item => (
-                                    <li key={item.key}>
-                                        -{item.alias},{item.key} {'可选'} {item.desc} {item.valueNeeded ? `默认值: ${item.defaultValue}` : ''} 
-                                        {legalTable(item.legalValue)}
+                                options.map(option => (
+                                    <li key={option.key}>
+                                        -{option.alias},{option.key} {'可选'} {option.desc} {option.valueNeeded ? `默认值: ${option.defaultValue}` : ''} 
+                                        {legalTable(option.legalValue)}
                                     </li>
                                 ))
                             }

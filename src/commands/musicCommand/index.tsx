@@ -9,15 +9,17 @@ import { Command } from '../../interface/interface';
 import { AxiosError } from 'axios';
 
 
-const command: Command = {
+const musicCommand: Command = {
     name: 'music',
     desc: '网易云音乐',
-    param: {
-        key: 'name',
-        desc: '获取关键词',
-        required: true
-    },
-    option: [
+    params: [
+        {
+            key: 'name',
+            desc: '获取关键词',
+            required: true
+        }
+    ],
+    options: [
         {
             key: 'type',
             alias: 't',
@@ -88,7 +90,7 @@ const command: Command = {
 
 
 export {
-    command
+    musicCommand
 }
 
 

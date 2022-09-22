@@ -1,11 +1,11 @@
-import { command as musicCommand } from './musicCommand'
-import { command as fanyiCommand } from './fanyiCommand'
-import { command as backgroundCommand } from './backgroundCommand'
-import { command as helpCommand } from './helpCommand';
-import { command as clearCommand } from './clearCommand';
-import { command as biliCommand } from './biliCommand';
-import { command as historyCommand } from './historyCommand';
-import { command as logCommand } from './logCommand';
+import { musicCommand } from './musicCommand'
+import { fanyiCommand } from './fanyiCommand'
+import { backgroundCommand } from './backgroundCommand'
+import { helpCommand } from './helpCommand';
+import { clearCommand } from './clearCommand';
+import { biliCommand } from './biliCommand';
+import { historyCommand } from './historyCommand';
+import { logCommand } from './logCommand';
 import { Command } from '../interface/interface';
 
 const commandMap: Command[] = [

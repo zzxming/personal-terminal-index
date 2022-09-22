@@ -5,19 +5,19 @@ import { CommandParamArgs, UseCommandHook } from "../hooks/command"
 export interface Command {
     name: string
     desc: string
-    param: CommandParam | null
-    option: CommandOption<any>[]
+    params: CommandParam[]
+    options: CommandOption[]
     action: ((args: CommandParamArgs, commandHandle: UseCommandHook) => string | React.ReactElement) | 
             ((args: CommandParamArgs, commandHandle: UseCommandHook) => Promise<string | React.ReactElement>)
 }
 
-export interface CommandOption<T> {
+export interface CommandOption {
     key: string             // 参数key
     alias: string           // 参数输入名
     desc: string            // 参数描述
-    defaultValue: string | number | boolean      // 参数默认值
+    defaultValue?: string | number | boolean      // 参数默认值
     valueNeeded: boolean    // 此参数是否需要值
-    legalValue: {
+    legalValue?: {
         [key: string | number]: any
     }   // 合法值数组, null为任何值
 }
@@ -64,3 +64,34 @@ export interface BiliVideoSearchInfo {
     numPages: number
 }
 // bili api 接口 end
+
+// log start
+/**
+ * 可修改的输入框类型
+ */
+export type EditInputType = 'number' | 'text' | 'textarea' | 'date' | 'time' | 'switch'
+
+/**
+ * 日志的内结果属性
+ */
+export interface LogDataDetail {
+    key: React.Key
+    date: string
+    content: string
+    status: boolean
+}
+/**
+ * 日志的数据结构
+ */
+export interface LogData {
+    [key: string]: LogDataDetail[]
+}
+// log end
+
+
+export interface MarkData {
+    [name: string]: {
+        url: string,
+        icon: string
+    }
+}

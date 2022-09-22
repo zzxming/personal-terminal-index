@@ -2,7 +2,7 @@
 
 module.exports = {
     baiduFanYiConfig: {
-        appid: 0,
+        appid: 0, 
         key: ''
     },
 }

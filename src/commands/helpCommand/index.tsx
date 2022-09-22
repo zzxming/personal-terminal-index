@@ -3,15 +3,17 @@ import { Command } from "../../interface/interface";
 import { commandDetail, commandList } from "./helpCommandOutput";
 
 
-const command: Command = {
+const helpCommand: Command = {
     name: 'help',
     desc: '查看命令帮助',
-    param: {
-        key: 'command',
-        desc: '命令名称',
-        required: false
-    },
-    option: [],
+    params: [
+        {
+            key: 'command',
+            desc: '命令名称',
+            required: false
+        }
+    ],
+    options: [],
     action(args, commandHandle) {
         // console.log(commandMap)
         const { _ } = args;
@@ -28,7 +30,7 @@ const command: Command = {
 }
 
 export {
-    command
+    helpCommand
 }
 
 

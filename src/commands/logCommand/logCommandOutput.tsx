@@ -5,30 +5,22 @@ import moment from 'moment'
 import { ColumnType } from "antd/lib/table";
 import { Rule } from "antd/lib/form";
 import css from './index.module.css'
+import { EditInputType, LogData, LogDataDetail } from "../../interface/interface";
 
 
 
-/**
- * 可修改的输入框类型
- */
-type EditInputType = 'number' | 'text' | 'textarea' | 'date' | 'time' | 'switch'
+
 /**
  * 日志的内结果属性
  */
-interface LogDataDetail<T = any> extends TableData, Expandable<T> {
+interface LogTableDataDetail<T = any> extends LogDataDetail, Expandable<T> {
     content: string
     status: boolean
 }
 /**
- * 日志的数据结构
- */
-interface LogData {
-    [key: string]: LogDataDetail[]
-}
-/**
  * 日志外层 columns
  */
-interface LogDataOut<T = any> extends TableData, Expandable<T> {
+interface LogTableDataOut<T = any> extends TableData, Expandable<T> {
     
 }
 /**
@@ -42,7 +34,7 @@ interface TableData {
  * ExpandableTable 的可展开表格生成组件的 props
  */
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement>  {
-    record: LogDataDetail
+    record: LogTableDataDetail
     dataIndex: string
     title: string
     inputType: EditInputType
@@ -94,7 +86,7 @@ interface Expandable<T> {
  * 获取日志数据生成表格
  */
 const GetLogTable: React.FC = () => {
-    const [data, setData] = useState<LogDataOut<LogDataDetail>[]>([]);
+    const [data, setData] = useState<LogTableDataOut<LogTableDataDetail>[]>([]);
 
     useEffect(() => {
         getLog()
@@ -106,7 +98,7 @@ const GetLogTable: React.FC = () => {
             localStorageSetItem('log', {})
             return {}
         }
-        const result: LogDataOut<LogDataDetail>[] = Object.keys(data).map(key => {
+        const result: LogTableDataOut<LogTableDataDetail>[] = Object.keys(data).map(key => {
             let childrenData = [...data[key]]
             childrenData.sort((a, b) => moment(a.date, 'HH-mm-ss').valueOf() - moment(b.date, 'HH-mm-ss').valueOf())
             return {
@@ -134,7 +126,7 @@ const GetLogTable: React.FC = () => {
                             width: 140, 
                             editable: true,
                             inputType: 'switch',
-                            render: (_: any, recordDetail: LogDataDetail) => (
+                            render: (_: any, recordDetail: LogTableDataDetail) => (
                                 <span><Badge status={recordDetail.status ? 'success' : 'warning'} />{recordDetail.status ? 'Finished' : 'To do'}</span>
                             ) 
                         }, {
@@ -193,7 +185,7 @@ const GetLogTable: React.FC = () => {
         return result
     }
     // 表格列
-    const columns: TableColumns<LogDataOut<LogDataDetail>>[] = [
+    const columns: TableColumns<LogTableDataOut<LogTableDataDetail>>[] = [
         { 
             title: '日期', 
             dataIndex: 'date', 
@@ -238,7 +230,7 @@ const GetLogTable: React.FC = () => {
     ]
 
     // 添加日志的日期
-    const addLogDay = (columns: LogDataOut[]) => {
+    const addLogDay = (columns: LogTableDataOut[]) => {
         let date = moment().format('YYYY-MM-DD');
         let data = localStorageGetItem('log')
         if (data[date]) {
@@ -254,7 +246,7 @@ const GetLogTable: React.FC = () => {
         getLog();
     }
     // 添加日志日期中的事件
-    const addLogEvent = (key: string, columns: LogDataOut[]) => {
+    const addLogEvent = (key: string, columns: LogTableDataOut[]) => {
         let time = moment().format('HH:mm:ss')
         let data: LogData = localStorageGetItem('log');
         let newData = { ...data };
@@ -289,7 +281,7 @@ const GetLogTable: React.FC = () => {
         expendable: true,
         addColumn: addLogDay
     }
-    return <ExpandableTable<LogDataOut<LogDataDetail>> {...expandableTableProps} />
+    return <ExpandableTable<LogTableDataOut<LogTableDataDetail>> {...expandableTableProps} />
 }
 // React.FC 无法实现泛型
 /**

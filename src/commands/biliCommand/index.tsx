@@ -15,15 +15,17 @@ const result_type = [
     'video'
 ]
 
-const command: Command = {
+const biliCommand: Command = {
     name: 'bili',
     desc: 'b站搜索',
-    param: {
-        key: 'keyword',
-        desc: '关键词',
-        required: true,
-    },
-    option: [
+    params: [
+        {
+            key: 'keyword',
+            desc: '关键词',
+            required: true,
+        }
+    ],
+    options: [
         {
             key: 'type',
             alias: 't', 
@@ -50,5 +52,5 @@ const command: Command = {
 }
 
 export {
-    command
+    biliCommand
 }

@@ -12,15 +12,15 @@ function commandUseFunc(command: Command): string {
     }
     
     const name = command.name;
-    let param = '';
-    if (command.param && Object.keys(command.param).length > 0) {
-        param = isRequired(command.param.required, command.param.desc);
-    }
-    let option = '';
-    command.option.forEach(item => {
-        option += ' ' + isRequired(false, `-${item.alias} ${item.desc}`);
+    let paramStr = '';
+    command.params.forEach(param => {
+        paramStr += ' ' + isRequired(param.required, param.desc);
     });
-    return `${name} ${param} ${option}`;
+    let optionStr = '';
+    command.options.forEach(option => {
+        optionStr += ' ' + isRequired(false, `-${option.alias} ${option.desc}`);
+    });
+    return `${name} ${paramStr} ${optionStr}`;
 }
 
 export {

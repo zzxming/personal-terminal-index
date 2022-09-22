@@ -2,15 +2,17 @@ import { List } from 'antd';
 import { Command } from '../../interface/interface';
 import style from './index.module.css'
 
-const command: Command = {
+const historyCommand: Command = {
     name: 'history',
     desc: '查看历史命令',
-    param: {
-        key: 'num',
-        desc: '显示历史条数',
-        required: false
-    },
-    option: [],
+    params: [
+        {
+            key: 'num',
+            desc: '显示历史条数',
+            required: false
+        }
+    ],
+    options: [],
     async action(args, commandHandle) {
         // console.log(args)
         const { _ } = args;
@@ -42,7 +44,7 @@ const command: Command = {
 
 
 export {
-    command
+    historyCommand
 }
 
 

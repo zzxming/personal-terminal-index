@@ -5,11 +5,11 @@ import { GetLogTable } from "./logCommandOutput";
 
 
 // 日期,内容.根据日期分类.
-const command: Command = {
+const logCommand: Command = {
     name: 'log',
     desc: '个人日志',
-    param: null,
-    option: [],
+    params: [],
+    options: [],
     action(args, commandHandle) {
         // console.log(args);
         
@@ -18,5 +18,5 @@ const command: Command = {
 }
 
 export {
-    command
+    logCommand
 };

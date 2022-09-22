@@ -1,11 +1,11 @@
 
 import { Command } from '../../interface/interface';
 
-const command: Command = {
+const clearCommand: Command = {
     name: 'clear',
     desc: '清屏',
-    param:  null,
-    option: [],
+    params:  [],
+    options: [],
     action(args, commandHandle) {
         // console.log(commandHandle)
         commandHandle.clearCommand();
@@ -14,5 +14,5 @@ const command: Command = {
 }
 
 export {
-    command
+    clearCommand
 }

@@ -91,7 +91,7 @@ const useCommand = (): UseCommandHook => {
      * @param {*} commands 除命令外的命令字符串数组
      * @returns 解析完成后对象, _为输入参数
      */
-    function paramParse(commands: string[], option: CommandOption<any>[]) {
+    function paramParse(commands: string[], option: CommandOption[]) {
         const params: CommandParamArgs = {
             _: [],
         };
@@ -102,7 +102,7 @@ const useCommand = (): UseCommandHook => {
                 params._.push(nowParams);
             } else {
                 const alias = nowParams.slice(1);
-                const commandOption = option.find(item => item.alias === alias);
+                const commandOption= option.find(item => item.alias === alias);
                 // option参数不存在
                 if (!commandOption) {
                     continue;
@@ -141,9 +141,10 @@ const useCommand = (): UseCommandHook => {
             // params参数检测
             // console.log(commandParams)
             // console.log(resultCommand)
-            const option = resultCommand.option;
+            const option = resultCommand.options;
             const paramsObj = paramParse(commandFragment.slice(1), option);
-            if (resultCommand.param?.required && paramsObj._.length < 1) {
+            const paramsCount = resultCommand.params.reduce((count, param) => param.required ? ++count : count, 0);
+            if (paramsObj._.length < paramsCount) {
                 // param参数必须,但未输入
                 pushCommands('param参数缺少', true);
                 return;

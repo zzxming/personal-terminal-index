@@ -2,15 +2,17 @@ import { getBackgroundImageUrl, ImageType } from "../../assets/js/api"
 import { Command } from "../../interface/interface";
 import { localStorageSetItem } from "../../utils/localStorage";
 
-const command: Command = {
+const backgroundCommand: Command = {
     name: 'bg',
     desc: '切换背景图片',
-    param: {
-        key: 'url',
-        desc: '图片路径',
-        required: false,
-    },
-    option: [
+    params: [
+        {
+            key: 'url',
+            desc: '图片路径',
+            required: false,
+        }
+    ],
+    options: [
         {
             key: 'type',
             alias: 't',
@@ -48,6 +50,6 @@ const command: Command = {
 }
 
 export {
-    command
+    backgroundCommand
 }
 
