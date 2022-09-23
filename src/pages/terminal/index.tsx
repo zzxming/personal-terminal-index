@@ -1,8 +1,12 @@
-import { useRef, useLayoutEffect, useState } from "react";
+import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import useBackgroundImage from "../../hooks/backgroundImage";
 import useCommand from "../../hooks/command";
 import css from './index.module.css'
 import { throttle } from 'lodash'
+import { MarkList } from "../../commands/markCommand/markListOutput";
+import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
+import { localStorageGetItem } from "../../utils/localStorage";
+import { MarkData } from "../../interface/interface";
 
 const Terminal: React.FC = () => {
 
@@ -10,12 +14,27 @@ const Terminal: React.FC = () => {
     const commandHandle = useCommand();
     const { commands, historyCommands, historyCommandsIndex, setHint, setHistoryCommandsIndex, excuteCommand } = commandHandle;
     const [hintTxt, setHintTxt] = useState('')
-    const mask = useRef<HTMLDivElement>(null);
+    const view = useRef<HTMLDivElement>(null);
     const inp = useRef<HTMLInputElement>(null);
+    const [inputMargin, setInputMargin] = useState<number>(0);
+    
+    useEffect(() => {
+        markChangedVisible();
+        window.addEventListener(LOCALSTORAGEMARKEVENT, markChangedVisible)
+        return () => {
+            window.removeEventListener(LOCALSTORAGEMARKEVENT, markChangedVisible)
+        }
+    }, []);
+
+    const markChangedVisible = () => {
+        let mark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+        console.log(mark)
+        setInputMargin((mark.show ? 58 : 0))
+    }
   
     // 保持输入会在屏幕内,最下方
     useLayoutEffect(() => {
-        mask.current && (mask.current.scrollTop = mask.current?.scrollHeight);
+        scrollScream();
     });
 
     // 更新一定要在父组件, 不如不能引起app的render, 导致不能从hook中获取最新的commands
@@ -23,11 +42,16 @@ const Terminal: React.FC = () => {
         excuteCommand(inp.current?.value.trim() || '', commandHandle);
         inp.current && (inp.current.value = '');
         setHintTxt('');
+        scrollScream();
     }
     // 输入框聚焦
     function focusInput(e: React.MouseEvent<HTMLDivElement>) {
         e.stopPropagation();
         inp.current?.focus();
+    }
+    /** 保持输入框在视口内 */
+    function scrollScream() {
+        view.current && (view.current.scrollTop = view.current?.scrollHeight);
     }
 
     /**
@@ -97,30 +121,35 @@ const Terminal: React.FC = () => {
     const throttleKeyPressEvnet = throttle(keyPressEvent, 1000);
 
     return (
-        <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
-            <div ref={mask} className={css.terminal_mask} onClick={focusInput}>
-                {
-                    commands && commands.map((item) => (
-                        <div className={css.command_result} key={'local' + item.key}>
-                            {
-                                item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
-                            }
-                            { item.construct }
+        <>
+            <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
+                <div className={css.terminal_mask} onClick={focusInput}>
+                    <MarkList />
+                    <div ref={view} className={css.terminal_command} style={{top: `${inputMargin}px`,height: `calc(100% - ${inputMargin}px)`}}>
+                        {
+                            commands && commands.map((item) => (
+                                <div className={css.command_result} key={'local' + item.key}>
+                                    {
+                                        item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
+                                    }
+                                    { item.construct }
+                                </div>
+                            ))
+                        }
+                        <div className={css.terminal_input}>
+                            <span className={css.terminal_user}>[local]:</span>
+                            <input ref={inp} className={css.input_command} onKeyDown={keydownEvent} onKeyPress={throttleKeyPressEvnet} />
                         </div>
-                    ))
-                }
-                <div className={css.terminal_input}>
-                    <span className={css.terminal_user}>[local]:</span>
-                    <input ref={inp} className={css.input_command} onKeyDown={keydownEvent} onKeyPress={throttleKeyPressEvnet} />
+                        {
+                            hintTxt ?
+                                <div className={css.terminal_hint}>
+                                    hint: {hintTxt}
+                                </div> : ''
+                        }
+                    </div>
                 </div>
-                {
-                    hintTxt ?
-                        <div className={css.terminal_hint}>
-                            hint: {hintTxt}
-                        </div> : ''
-                }
             </div>
-        </div>
+        </>
     )
 }
 

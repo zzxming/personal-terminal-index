@@ -1,4 +1,5 @@
 import { getBackgroundImageUrl, ImageType } from "../../assets/js/api"
+import { LOCALSTORAGEBGURL } from "../../assets/js/const";
 import { Command } from "../../interface/interface";
 import { localStorageSetItem } from "../../utils/localStorage";
 
@@ -27,12 +28,13 @@ const backgroundCommand: Command = {
             }
         }
     ],
+    subCommand: [],
     async action(args, commandHandle) {
         const { _, type } = args;
 
         if (_.length > 0) {
             // 输入了param,作为图片路径
-            localStorageSetItem('bgurl', _[0]);
+            localStorageSetItem(LOCALSTORAGEBGURL, _[0]);
             return '更换成功';
         }
 
@@ -44,7 +46,7 @@ const backgroundCommand: Command = {
         if (result.data.data === '') {
             return '请求失败';
         }
-        localStorageSetItem('bgurl', result.data.data);
+        localStorageSetItem(LOCALSTORAGEBGURL, result.data.data);
         return '更换成功';
     }
 }

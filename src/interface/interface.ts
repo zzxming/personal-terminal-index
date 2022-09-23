@@ -7,6 +7,7 @@ export interface Command {
     desc: string
     params: CommandParam[]
     options: CommandOption[]
+    subCommand: Command[]
     action: ((args: CommandParamArgs, commandHandle: UseCommandHook) => string | React.ReactElement) | 
             ((args: CommandParamArgs, commandHandle: UseCommandHook) => Promise<string | React.ReactElement>)
 }
@@ -89,9 +90,15 @@ export interface LogData {
 // log end
 
 
+// mark start
 export interface MarkData {
-    [name: string]: {
-        url: string,
-        icon: string
-    }
+    show: boolean
+    data: Mark[]
 }
+export interface Mark {
+    key: React.Key
+    title: string
+    url: string,
+    icon: string
+}
+// mark end

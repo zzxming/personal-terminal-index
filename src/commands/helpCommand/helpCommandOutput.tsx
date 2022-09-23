@@ -79,7 +79,13 @@ const commandDetail = (command: Command) => {
                             {
                                 options.map(option => (
                                     <li key={option.key}>
-                                        -{option.alias},{option.key} {'可选'} {option.desc} {option.valueNeeded ? `默认值: ${option.defaultValue}` : ''} 
+                                        -{option.alias},{option.key} {'可选'} {option.desc} {
+                                            option.valueNeeded ? 
+                                                option.defaultValue ? 
+                                                    `默认值: ${option.defaultValue}` 
+                                                    : '' 
+                                                : ''
+                                        } 
                                         {legalTable(option.legalValue)}
                                     </li>
                                 ))

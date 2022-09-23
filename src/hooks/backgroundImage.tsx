@@ -1,27 +1,29 @@
 import { useCallback, useEffect, useState } from "react"
+import { LOCALSTORAGEBGURL, LOCALSTORAGEBGURLEVENT } from "../assets/js/const";
+import { localStorageGetItem, localStorageSetItem } from "../utils/localStorage";
 
 
-function useBackgroundImage() {
+const useBackgroundImage = () => {
 
     const [imgurl, setImgurl] = useState<string>('');
 
     const setbackgroundImage = useCallback((imgurl: string) => {
         // console.log(imgurl)
-        localStorage.setItem('bgurl', imgurl);
+        localStorageSetItem(LOCALSTORAGEBGURL, imgurl, LOCALSTORAGEBGURLEVENT);
         setImgurl(imgurl);
         return '更换成功';
     }, []);
     
     useEffect(() => {
         // 要监听到localstorage的变化
-        setbackgroundImage(localStorage.getItem('bgurl') || '');
+        setbackgroundImage(localStorageGetItem(LOCALSTORAGEBGURL) || '');
         function updateBg() {
-            // console.log(localStorage.getItem('bgurl'))
-            setImgurl(localStorage.getItem('bgurl') || '');
+            // console.log(localStorage.getItem(LOCALSTORAGEBGURL))
+            setImgurl(localStorageGetItem(LOCALSTORAGEBGURL) || '');
         }
-        window.addEventListener('setItem', updateBg);
+        window.addEventListener(LOCALSTORAGEBGURLEVENT, updateBg);
         return () => {
-            window.removeEventListener('setItem', updateBg);
+            window.removeEventListener(LOCALSTORAGEBGURLEVENT, updateBg);
         }
     }, [])
 

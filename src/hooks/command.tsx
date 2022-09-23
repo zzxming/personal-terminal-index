@@ -41,7 +41,18 @@ const useCommand = (): UseCommandHook => {
     }, [historyCommands]);
 
     function pushCommands(command: React.ReactElement | string, isResult: boolean) {
-        if (command === '') return;
+        // 空命令直接输出
+        if (command === '') {
+            setCommands(commands => {
+                // console.log(commands)
+                return [...commands, {
+                    construct: <div className={style.command_txt}></div>,
+                    key: `empty ${new Date().getTime()}`, 
+                    isResult
+                }]
+            });
+            return;
+        }
         // 当命令不是字符串时,元素需要key值不正确
         if (typeof command !== 'string' && !command.key) {
             // console.log(command)
@@ -88,31 +99,39 @@ const useCommand = (): UseCommandHook => {
 
     /**
      * 解析参数和选项
-     * @param {*} commands 除命令外的命令字符串数组
+     * @param commands 除命令外的命令字符串数组
+     * @param option 命令的 options 选项, 若有则按 option 中的key返回
      * @returns 解析完成后对象, _为输入参数
      */
-    function paramParse(commands: string[], option: CommandOption[]) {
+    function paramParse(commands: string[], option?: CommandOption[]) {
         const params: CommandParamArgs = {
             _: [],
         };
 
         for (let i = 0; i < commands.length; i++) {
+            if (commands[i] === '') continue;
+
             let nowParams = commands[i];
             if (!nowParams.startsWith('-')) {
                 params._.push(nowParams);
             } else {
                 const alias = nowParams.slice(1);
-                const commandOption= option.find(item => item.alias === alias);
-                // option参数不存在
-                if (!commandOption) {
-                    continue;
+                // 传递了option, 根据option判断此参数是否有效
+                let commandOption: CommandOption | undefined;
+                if (option) {
+                    commandOption = option.find(item => item.alias === alias);
+                    // option参数不存在
+                    if (!commandOption) {
+                        continue;
+                    }
                 }
+                // 若没有传递option传递, 直接根据输入参数记录param
                 if (!commands[i + 1] || commands[i + 1].startsWith('-')) {
                     params[alias] = true;
-                    params[commandOption.key] = true;
+                    commandOption && (params[commandOption.key] = true);
                 } else {
                     params[alias] = commands[i + 1];
-                    params[commandOption.key] = commands[i + 1];
+                    commandOption && (params[commandOption.key] = commands[i + 1]);
                     i += 1;
                 }
             }
@@ -129,44 +148,87 @@ const useCommand = (): UseCommandHook => {
      */
     async function excuteCommand(command: string, commandHandle: UseCommandHook) {
         console.log('excute', command)
-        pushCommands(command, false);
-        if (command.trim() === '') return;
-        pushHistoryCommands(command);
+        if (command.trim() === '') {
+            pushCommands(command, false);
+            return;
+        }
 
         const commandFragment = command.split(' ');
         const resultCommand = searchCommand(commandFragment[0]);
-
+        
         let result: string | React.ReactElement;
         if (resultCommand) {
-            // params参数检测
+            // 子命令检测
+            let actionCommand = resultCommand;      // 最终执行命令
+            let commandParams: CommandParamArgs = paramParse(commandFragment.slice(1)); // 命令参数
+            do {
+                // 是否有子命令
+                if (actionCommand.subCommand.length < 1) {
+                    break;
+                }
+                // 若子命令输入正确, 则改变最终执行命令, 并删除参数第一位子命令 name
+                // 若输入错误则执行原本命令
+                let subCommand = actionCommand.subCommand.find(command => command.name === commandParams._[0]);
+                if (subCommand) {
+                    actionCommand = subCommand;
+                    commandParams._.splice(0, 1);
+                }
+                else {
+                    break;
+                }
+            } while(true)
+
             // console.log(commandParams)
-            // console.log(resultCommand)
-            const option = resultCommand.options;
-            const paramsObj = paramParse(commandFragment.slice(1), option);
-            const paramsCount = resultCommand.params.reduce((count, param) => param.required ? ++count : count, 0);
+            // console.log(actionCommand)
+            
+            // 根据执行命令的option中key保存params参数
+            const options = actionCommand.options;
+            const paramsObj = { ...commandParams }
+            for (let option of options) {
+                if (paramsObj[option.alias]) {
+                    paramsObj[option.key] = paramsObj[option.alias]
+                }
+            }
+            // 确认param的数量正确
+            const paramsCount = actionCommand.params.reduce((count, param) => param.required ? ++count : count, 0);
+            // console.log(paramsCount)
             if (paramsObj._.length < paramsCount) {
                 // param参数必须,但未输入
+                pushCommands(command, false);
+                pushHistoryCommands(command);
                 pushCommands('param参数缺少', true);
                 return;
             }
             // option参数, 赋默认值
-            for (let i = 0; i < option.length; i++) {
-                const item = option[i];
+            for (let i = 0; i < options.length; i++) {
+                const item = options[i];
                 const getValue = paramsObj[item.alias];
                 // console.log(item)
                 // console.log(!getValue, item.defaultValue)
-                if (!getValue && item.defaultValue !== undefined) {
+                // option存在默认值, 输入option值为true或没有输入option值, 赋默认值
+                if (item.defaultValue !== undefined && ((getValue && typeof getValue === 'boolean') || !getValue)) {
                     paramsObj[item.alias] = item.defaultValue;
                     paramsObj[item.key] = item.defaultValue;
                 }
+                console.log(item, paramsObj[item.alias])
+                if (item.legalValue) {
+                    if (!Object.keys(item.legalValue).includes(paramsObj[item.alias].toString())) {
+                        pushCommands(command, false);
+                        pushHistoryCommands(command);
+                        pushCommands('option参数错误', true);
+                        return;
+                    }
+                }
             }
-            
+            // 执行
             // console.log(paramsObj)
-            result = await resultCommand.action(paramsObj, commandHandle);
+            result = await actionCommand.action(paramsObj, commandHandle);
         } else {
             // 命令不存在
             result = '命令不存在';
         }
+        pushCommands(command, false);
+        pushHistoryCommands(command);
         pushCommands(result, true);
         // console.log(commands)
         // return result;

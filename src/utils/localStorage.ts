@@ -1,11 +1,12 @@
 // 重写 setItem , 使同页面能够监听到 localstorage 的变化
 const originLocalStorageSetItem = localStorage.setItem;
-const localStorageSetItem = (key: string, value: any) => {
+const localStorageSetItem = (key: string, value: any, eventName?: string) => {
     if (typeof value !== 'string') {
         value = JSON.stringify(value)
     }
-    if (key === 'bgurl') {
-        let setItem = new Event('setItem');
+    // 同步背景图片的更新
+    if (eventName) {
+        let setItem = new Event(eventName);
         originLocalStorageSetItem.call(localStorage, key, value);
         window.dispatchEvent(setItem);
         return;
@@ -15,7 +16,13 @@ const localStorageSetItem = (key: string, value: any) => {
 
 const localStorageGetItem = (key: string) => {
     let result = localStorage.getItem(key);
-    return result ? JSON.parse(result) : null;
+    try {
+        // 非json格式字符串会报错
+        return result ? JSON.parse(result) : null;
+    }
+    catch (e) {
+        return result
+    }
 }
 
 export {

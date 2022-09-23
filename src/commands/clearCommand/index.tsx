@@ -6,6 +6,7 @@ const clearCommand: Command = {
     desc: '清屏',
     params:  [],
     options: [],
+    subCommand: [],
     action(args, commandHandle) {
         // console.log(commandHandle)
         commandHandle.clearCommand();

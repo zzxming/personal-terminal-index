@@ -1,6 +1,6 @@
 
 
-interface IALink {
+interface IALinkProps {
     href: string
     children?: React.ReactElement | React.ReactElement[]
     className?: string
@@ -8,7 +8,7 @@ interface IALink {
 }
 
 
-const ALink: React.FC<IALink> = (props) => {
+const ALink: React.FC<IALinkProps> = (props) => {
     // console.log(props)
     const clickHandle = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();

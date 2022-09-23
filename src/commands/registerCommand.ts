@@ -7,6 +7,7 @@ import { biliCommand } from './biliCommand';
 import { historyCommand } from './historyCommand';
 import { logCommand } from './logCommand';
 import { Command } from '../interface/interface';
+import { markCommand } from './markCommand';
 
 const commandMap: Command[] = [
     musicCommand,
@@ -17,6 +18,7 @@ const commandMap: Command[] = [
     biliCommand,
     historyCommand,
     logCommand,
+    markCommand,
 ]
 
 export {

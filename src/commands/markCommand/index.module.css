@@ -1,0 +1,33 @@
+
+.mark_list {
+    position: fixed;
+    left: 0;
+    top: 10px;
+    width: 100%;
+    padding: 0 20px;
+    background-color: #fff;
+    overflow-x: auto;
+}
+.mark_list_item {
+    display: flex;
+    align-items: center;
+    transition: backgrounColor 1s 1s linear;
+    border-radius: 16px;
+    padding: 4px;
+}
+.mark_list_item:hover {
+    background-color: #eee;
+}
+.mark_icon {
+}
+.mark_list_item .mark_link {
+    margin-left: 6px;
+    color: #000;
+}
+.mark_list :global(.ant-list-item) {
+    display: inline-flex;
+    margin: 0 4px;
+}
+.mark_list :global(.ant-list-items) {
+    white-space: nowrap;
+}
