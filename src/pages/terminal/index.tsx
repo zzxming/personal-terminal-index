@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { useRef, useLayoutEffect, useState, useEffect, ChangeEvent } from "react";
 import useBackgroundImage from "../../hooks/backgroundImage";
 import useCommand from "../../hooks/command";
 import css from './index.module.css'
@@ -28,7 +28,6 @@ const Terminal: React.FC = () => {
 
     const markChangedVisible = () => {
         let mark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
-        console.log(mark)
         setInputMargin((mark.show ? 58 : 0))
     }
   
@@ -97,7 +96,7 @@ const Terminal: React.FC = () => {
                 break;
             }
             case 'Backspace': {
-                throttleKeyPressEvnet(e);
+                throttleKeyPressEvnet();
                 break;
             }
             default: {
@@ -105,15 +104,13 @@ const Terminal: React.FC = () => {
             }
         }
     }
-
-    function keyPressEvent(e: React.KeyboardEvent<HTMLInputElement>) {
-        // console.log(e)
-        if (!e || e.key === 'Enter') return;
+    /** 根据输入字显示提示文字 */
+    function keyPressEvent() {
         // console.log(inp.current)
         if (inp.current) {
-            let commandStr = inp.current?.value.split(' ');
+            let commandStr = inp.current?.value;
             // console.log(commandStr)
-            let getCommand = setHint(commandStr[0]);
+            let getCommand = setHint(commandStr);
             // console.log(getCommand)
             setHintTxt(getCommand as any);
         }
@@ -138,7 +135,7 @@ const Terminal: React.FC = () => {
                         }
                         <div className={css.terminal_input}>
                             <span className={css.terminal_user}>[local]:</span>
-                            <input ref={inp} className={css.input_command} onKeyDown={keydownEvent} onKeyPress={throttleKeyPressEvnet} />
+                            <input ref={inp} className={css.input_command} onKeyDown={keydownEvent} onChange={throttleKeyPressEvnet} />
                         </div>
                         {
                             hintTxt ?

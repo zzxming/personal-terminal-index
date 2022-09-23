@@ -74,7 +74,7 @@ const useCommand = (): UseCommandHook => {
         }
         // console.log(typeof command)
         setCommands(commands => {
-            // console.log(commands)
+            console.log(commands)
             return [...commands, {
                 construct: <div className={className}>{command}</div>,
                 key, isResult
@@ -156,6 +156,8 @@ const useCommand = (): UseCommandHook => {
         const commandFragment = command.split(' ');
         const resultCommand = searchCommand(commandFragment[0]);
         
+        pushCommands(command, false);
+        pushHistoryCommands(command);
         let result: string | React.ReactElement;
         if (resultCommand) {
             // 子命令检测
@@ -163,12 +165,12 @@ const useCommand = (): UseCommandHook => {
             let commandParams: CommandParamArgs = paramParse(commandFragment.slice(1)); // 命令参数
             do {
                 // 是否有子命令
-                if (actionCommand.subCommand.length < 1) {
+                if (actionCommand.subCommands.length < 1) {
                     break;
                 }
                 // 若子命令输入正确, 则改变最终执行命令, 并删除参数第一位子命令 name
                 // 若输入错误则执行原本命令
-                let subCommand = actionCommand.subCommand.find(command => command.name === commandParams._[0]);
+                let subCommand = actionCommand.subCommands.find(subCommand => subCommand.name === commandParams._[0]);
                 if (subCommand) {
                     actionCommand = subCommand;
                     commandParams._.splice(0, 1);
@@ -194,8 +196,6 @@ const useCommand = (): UseCommandHook => {
             // console.log(paramsCount)
             if (paramsObj._.length < paramsCount) {
                 // param参数必须,但未输入
-                pushCommands(command, false);
-                pushHistoryCommands(command);
                 pushCommands('param参数缺少', true);
                 return;
             }
@@ -210,11 +210,10 @@ const useCommand = (): UseCommandHook => {
                     paramsObj[item.alias] = item.defaultValue;
                     paramsObj[item.key] = item.defaultValue;
                 }
-                console.log(item, paramsObj[item.alias])
-                if (item.legalValue) {
+                // console.log(item, paramsObj[item.alias])
+                if (item.legalValue && paramsObj[item.alias]) {
                     if (!Object.keys(item.legalValue).includes(paramsObj[item.alias].toString())) {
-                        pushCommands(command, false);
-                        pushHistoryCommands(command);
+                        
                         pushCommands('option参数错误', true);
                         return;
                     }
@@ -227,27 +226,40 @@ const useCommand = (): UseCommandHook => {
             // 命令不存在
             result = '命令不存在';
         }
-        pushCommands(command, false);
-        pushHistoryCommands(command);
         pushCommands(result, true);
         // console.log(commands)
-        // return result;
     }
     /**
+     * 
      * 显示的提示文字
      * @param str 当前输入命令
+     * @param commands 查看命令范围
      * @returns 提示文字
      */
-    function setHint(str: string): string {
-        if (str.trim().length < 1) {
+    function setHint(str: string, commands = commandMap): string {
+
+        str = str.trim();
+        // 空字符返回
+        if (str === '') {
             return '';
         }
-        let resultCommand = commandMap.filter(command => {
-            return command.name.startsWith(str);
-        });
+        let inpArr = str.split(' ');
+        // 主命令输入
+        let mainCommand = inpArr[0];
+        let resultCommand = commands.filter(command => {
+            return command.name.startsWith(mainCommand);
+        })[0];
+
+        if (!resultCommand) {
+            return '';
+        }
+        // 是否存在子命令
+        let subCommands = resultCommand.subCommands;
+        if (subCommands.length > 0 && inpArr.length > 1) {
+            return `${mainCommand} ${setHint(inpArr.slice(1).join(' '), subCommands)}`
+        }
         
-        // console.log(resultCommand[0])
-        return commandUseFunc(resultCommand[0]);
+        return commandUseFunc(resultCommand);
     }
 
 

@@ -10,7 +10,7 @@ const logCommand: Command = {
     desc: '个人日志',
     params: [],
     options: [],
-    subCommand: [],
+    subCommands: [],
     action(args, commandHandle) {
         // console.log(args);
         

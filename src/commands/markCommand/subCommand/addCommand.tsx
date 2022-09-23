@@ -18,7 +18,7 @@ const addMark: Command = {
         }
     ],
     options: [],
-    subCommand: [],
+    subCommands: [],
     action(args, commandHandle) {
         // console.log(args)
 

@@ -28,7 +28,7 @@ const backgroundCommand: Command = {
             }
         }
     ],
-    subCommand: [],
+    subCommands: [],
     async action(args, commandHandle) {
         const { _, type } = args;
 

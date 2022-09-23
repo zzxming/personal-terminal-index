@@ -14,7 +14,7 @@ const helpCommand: Command = {
         }
     ],
     options: [],
-    subCommand: [],
+    subCommands: [],
     action(args, commandHandle) {
         // console.log(commandMap)
         const { _ } = args;

@@ -64,7 +64,7 @@ const fanyiCommand: Command = {
             legalValue: lang
         }
     ],
-    subCommand: [],
+    subCommands: [],
     async action(args, commandHandle) {
         // console.log(args)
         let { _, to: toArg, from: fromArg } = args as { _: string[], to: string, from: string };

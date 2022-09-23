@@ -1,7 +1,6 @@
 import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
 import { Command } from "../../interface/interface";
 import { localStorageSetItem, localStorageGetItem } from "../../utils/localStorage";
-import { MarkList } from "./markListOutput";
 import { addMark } from "./subCommand/addCommand";
 import { delMark } from "./subCommand/delCommand";
 
@@ -28,7 +27,7 @@ const markCommand: Command= {
             }
         }
     ],
-    subCommand: [
+    subCommands: [
         addMark,
         delMark
     ],

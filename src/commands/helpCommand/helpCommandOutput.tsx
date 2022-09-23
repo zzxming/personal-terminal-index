@@ -13,7 +13,8 @@ const commandList = () => (
     <div className={css.command_list} key={new Date().getTime() + 'help'}>
         <p className={css.command_list_txt}>命令列表:</p>
         {
-            commandMap.map(item => {
+            // 排序
+            commandMap.sort((a, b) => a.name > b.name ? 1 : -1).map(item => {
                 return (
                     <div className={css.command_item} key={item.name}>
                         <div className={css.command_command}>{item.name}</div>
@@ -30,7 +31,7 @@ const commandDetail = (command: Command) => {
         return '命令不存在';
     }
     
-    const { name, desc, params, options } = command;
+    const { name, desc, params, options, subCommands } = command;
 
     // 考虑一行展示两个参数, 即 '参数 描述 参数 描述'
     const legalTable = (legalValue: legalValueType<CommandOption, 'legalValue'>) => {
@@ -69,6 +70,23 @@ const commandDetail = (command: Command) => {
                         </ul>
                     </div> : 
                     ''
+            }
+            {
+                subCommands.length > 0 ?
+                <div>
+                    <p className={css.command_list_txt}>子命令: </p>
+                    <ul className={css.command_option_list}>
+                        {
+                            subCommands.map(subCommand => (
+                                <li>
+                                    <p className={css.command_list_txt}>{subCommand.name} {subCommand.desc}</p>
+                                    <p className={css.command_list_txt}>用法: {name} {commandUseFunc(subCommand)}</p>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div> : 
+                ''
             }
             
             {

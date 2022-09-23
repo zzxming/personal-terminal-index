@@ -7,7 +7,7 @@ export interface Command {
     desc: string
     params: CommandParam[]
     options: CommandOption[]
-    subCommand: Command[]
+    subCommands: Command[]
     action: ((args: CommandParamArgs, commandHandle: UseCommandHook) => string | React.ReactElement) | 
             ((args: CommandParamArgs, commandHandle: UseCommandHook) => Promise<string | React.ReactElement>)
 }

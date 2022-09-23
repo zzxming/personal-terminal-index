@@ -4,7 +4,7 @@ import { localStorageGetItem, localStorageSetItem } from "../../../utils/localSt
 
 const delMark: Command = {
     name: 'del',
-    desc: '添加书签',
+    desc: '删除书签',
     params: [
         {
             key: 'name',
@@ -14,7 +14,7 @@ const delMark: Command = {
         }
     ],
     options: [],
-    subCommand: [],
+    subCommands: [],
     action(args, commandHandle) {
         // console.log(args)
 

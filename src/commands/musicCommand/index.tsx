@@ -42,7 +42,7 @@ const musicCommand: Command = {
             }
         }
     ],
-    subCommand: [],
+    subCommands: [],
     async action(args, commandHandle) {
         // console.log(args)
         const { _, type, id } = args;

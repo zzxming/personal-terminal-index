@@ -38,7 +38,7 @@ const biliCommand: Command = {
             }
         }
     ],
-    subCommand: [],
+    subCommands: [],
     async action(args, commandHandle) {
         // console.log(args)
         const { _, type } = args;

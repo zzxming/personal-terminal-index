@@ -13,7 +13,7 @@ const historyCommand: Command = {
         }
     ],
     options: [],
-    subCommand: [],
+    subCommands: [],
     async action(args, commandHandle) {
         // console.log(args)
         const { _ } = args;
