@@ -1,5 +1,5 @@
 
-.mark_list {
+.mark_nav {
     position: fixed;
     left: 0;
     top: 10px;
@@ -8,26 +8,60 @@
     background-color: #fff;
     overflow-x: auto;
 }
-.mark_list_item {
+.mark_nav_item {
     display: flex;
     align-items: center;
     transition: backgrounColor 1s 1s linear;
     border-radius: 16px;
     padding: 4px;
 }
-.mark_list_item:hover {
+.mark_nav_item:hover {
     background-color: #eee;
 }
-.mark_icon {
+:global(.ant-avatar).mark_icon {
+    margin-right: 6px;
 }
-.mark_list_item .mark_link {
-    margin-left: 6px;
+.mark_nav_item .mark_link {
     color: #000;
 }
-.mark_list :global(.ant-list-item) {
+.mark_nav :global(.ant-list-item) {
     display: inline-flex;
     margin: 0 4px;
 }
-.mark_list :global(.ant-list-items) {
+.mark_nav :global(.ant-list-items) {
     white-space: nowrap;
+}
+.mark_nav :global(.ant-avatar.ant-avatar-icon) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+
+.mark_list_item {
+    display: inline-block;
+    width: 100%;
+}
+.mark_list_item_title {
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis ;
+    white-space: nowrap;
+}
+@media screen and (min-width: 750px) {
+    .mark_list_item {
+        width: 50%;
+    }
+}
+@media screen and (min-width: 980px) {
+    .mark_list_item {
+        width: 33.33%;
+    }
+}
+@media screen and (min-width: 1180px) {
+    .mark_list_item {
+        width: 25%;
+    }
 }

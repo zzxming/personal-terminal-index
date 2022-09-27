@@ -1,11 +1,36 @@
+.command_help {
+
+}
+
 .command_list {
     width: 100%;
 }
-.command_list_txt {
+.command_list_desc {
     margin: 0;
     height: 30px;
     line-height: 30px;
 }
+.command_detail {
+    margin: 0;
+    padding-left: 40px;
+}
+.command_sub {
+    margin: 10px 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #fff;
+}
+
+.command_param {
+
+}
+.command_sub_list {
+
+}
+.command_option {
+
+}
+
+
 
 .command_item {
     display: grid;
@@ -14,17 +39,10 @@
     line-height: 30px;
     margin-left: 20px;
 }
-
 .command_command {
     grid-area: command;
 }
-
 .command_desc {
     grid-area: desc;
-}
-
-.command_option_list {
-    margin: 0;
-    padding-left: 40px;
 }
 

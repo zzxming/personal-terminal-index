@@ -3,10 +3,10 @@ import { GlobalOutlined } from '@ant-design/icons';
 import { Mark, MarkData  } from "../../interface/interface"
 import css from './index.module.css'
 import { useEffect, useState } from "react";
-import { localStorageGetItem } from "../../utils/localStorage";
+import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
 
-const MarkList: React.FC = () => {
+const MarkNav: React.FC = () => {
 
     const [show, setShow] = useState(false);
     const [marks, setMarks] = useState<Mark[]>([]);
@@ -21,7 +21,14 @@ const MarkList: React.FC = () => {
     }, []);
     /** 获取最新mark */
     const getMark = () => {
-        let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData
+        let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+        // console.log(data)
+        if (!data) {
+            localStorageSetItem(LOCALSTORAGEMARK, {show: true, data: []});
+            setShow(true);
+            setMarks([]);
+            return;
+        }
         setShow(data.show);
         setMarks(data.data);
     }
@@ -29,15 +36,15 @@ const MarkList: React.FC = () => {
     return (
         <>
             {
-                show ? 
-                    <div className={css.mark_list}>
+                show && marks.length > 0 ? 
+                    <div className={css.mark_nav}>
                         <List
                             dataSource={marks}
                             split={false}
                             renderItem={item => (
-                                <List.Item>
-                                    <a className={css.mark_list_item} href={item.url}>
-                                        <Avatar className={css.mark_icon} src={item.icon} size={26} icon={<GlobalOutlined />} />
+                                <List.Item title={`${item.title}${'\n'}${item.url}`}>
+                                    <a className={css.mark_nav_item} href={item.url}>
+                                        <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
                                         <span className={css.mark_link}>{item.title}</span>
                                     </a>
                                 </List.Item>
@@ -51,5 +58,5 @@ const MarkList: React.FC = () => {
 }
 
 export {
-    MarkList
+    MarkNav
 }

@@ -3,7 +3,7 @@ import useBackgroundImage from "../../hooks/backgroundImage";
 import useCommand from "../../hooks/command";
 import css from './index.module.css'
 import { throttle } from 'lodash'
-import { MarkList } from "../../commands/markCommand/markListOutput";
+import { MarkNav } from "../../commands/markCommand/markCommandOutput";
 import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
 import { localStorageGetItem } from "../../utils/localStorage";
 import { MarkData } from "../../interface/interface";
@@ -13,11 +13,12 @@ const Terminal: React.FC = () => {
     const { imgurl } = useBackgroundImage();
     const commandHandle = useCommand();
     const { commands, historyCommands, historyCommandsIndex, setHint, setHistoryCommandsIndex, excuteCommand } = commandHandle;
-    const [hintTxt, setHintTxt] = useState('')
+    const [hintTxt, setHintTxt] = useState('');
     const view = useRef<HTMLDivElement>(null);
     const inp = useRef<HTMLInputElement>(null);
     const [inputMargin, setInputMargin] = useState<number>(0);
     
+    // 更新mark
     useEffect(() => {
         markChangedVisible();
         window.addEventListener(LOCALSTORAGEMARKEVENT, markChangedVisible)
@@ -61,15 +62,24 @@ const Terminal: React.FC = () => {
         // console.log(historyCommands)
         let updatedIndex ;
         if (isBack) {
-            updatedIndex = (historyCommandsIndex as unknown as number) - 1;
+            updatedIndex = historyCommandsIndex - 1;
         } else {
-            updatedIndex = (historyCommandsIndex as unknown as number) + 1;
+            updatedIndex = historyCommandsIndex + 1;
         }
-
-
+        // 防止越界
+        if (updatedIndex < 0) {
+            updatedIndex = 0;
+        }
+        if (updatedIndex > historyCommands.length - 1) {
+            // 到最后一次输入, 超出则变成输入状态
+            updatedIndex = historyCommands.length;
+            inp.current && (inp.current.value = '');
+            return;
+        }
         
-        setHistoryCommandsIndex((historyCommandsIndex as unknown as any));
-        let txt = (historyCommands[updatedIndex] as any)?.txt;
+        setHistoryCommandsIndex(updatedIndex);
+        let txt = historyCommands[updatedIndex]?.txt;
+        // console.log(historyCommands, updatedIndex, isBack)
         if (!txt) return;
 
         inp.current && (inp.current.value = txt);
@@ -121,7 +131,7 @@ const Terminal: React.FC = () => {
         <>
             <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
                 <div className={css.terminal_mask} onClick={focusInput}>
-                    <MarkList />
+                    <MarkNav />
                     <div ref={view} className={css.terminal_command} style={{top: `${inputMargin}px`,height: `calc(100% - ${inputMargin}px)`}}>
                         {
                             commands && commands.map((item) => (

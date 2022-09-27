@@ -1,4 +1,5 @@
-import { List } from 'antd';
+import { CommandResultListOutput } from '../../components/commandListOutput';
+import { HistoryCommand } from '../../hooks/command';
 import { Command } from '../../interface/interface';
 import style from './index.module.css'
 
@@ -29,14 +30,13 @@ const historyCommand: Command = {
 
         return (
             <div key={`history result ${new Date().getTime()}`} className={style.history}>
-                <List
-                    itemLayout="vertical"
-                    dataSource={showHistoryCommands}
-                    renderItem={(item, index) => (
+                <CommandResultListOutput<HistoryCommand> 
+                    data={showHistoryCommands} 
+                    render={(item, index) => (
                         <li className={style.history_item}>
                             {index + 1} {item.txt}
                         </li>
-                    )}
+                    )} 
                 />
             </div>
         )

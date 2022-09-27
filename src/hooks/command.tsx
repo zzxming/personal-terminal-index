@@ -9,7 +9,7 @@ interface Command {
     construct: React.ReactElement
     isResult: boolean
 }
-interface HistoryCommand {
+export interface HistoryCommand {
     txt: string
 }
 export interface CommandParamArgs {
@@ -74,7 +74,6 @@ const useCommand = (): UseCommandHook => {
         }
         // console.log(typeof command)
         setCommands(commands => {
-            console.log(commands)
             return [...commands, {
                 construct: <div className={className}>{command}</div>,
                 key, isResult
@@ -130,9 +129,18 @@ const useCommand = (): UseCommandHook => {
                     params[alias] = true;
                     commandOption && (params[commandOption.key] = true);
                 } else {
-                    params[alias] = commands[i + 1];
-                    commandOption && (params[commandOption.key] = commands[i + 1]);
-                    i += 1;
+                    // 匹配带空格的参数值
+                    // 如: mark modify 原来的名字 原来名字第二段 -n 第一段 第二段
+                    // 保证-n获取的参数值是'第一段 第二段', _匹配的值是['原来的名字', '原来名字第二段']
+                    let count = 1;
+                    let paramVal: string[] = [];
+                    do {
+                        paramVal.push(commands[i + count]);
+                        count += 1;
+                    } while (commands[i + count] && !commands[i + count].startsWith('-'))
+                    params[alias] = paramVal.join(' ');
+                    commandOption && (params[commandOption.key] = paramVal.join(' '));
+                    i += count;
                 }
             }
         }
@@ -199,6 +207,18 @@ const useCommand = (): UseCommandHook => {
                 pushCommands('param参数缺少', true);
                 return;
             }
+            // params合法值判断
+            for (let i = 0; i < actionCommand.params.length; i++) {
+                const item = paramsObj._[i];
+                let legalValue = actionCommand.params[i].legalValue;
+                if (legalValue) {
+                    let legalValues = Object.keys(legalValue);
+                    if (!legalValues.includes(item)) {
+                        pushCommands(`param ${actionCommand.params[i].key} 参数错误`, true);
+                        return;
+                    }
+                }
+            }
             // option参数, 赋默认值
             for (let i = 0; i < options.length; i++) {
                 const item = options[i];
@@ -211,6 +231,7 @@ const useCommand = (): UseCommandHook => {
                     paramsObj[item.key] = item.defaultValue;
                 }
                 // console.log(item, paramsObj[item.alias])
+                // 当存在输入值约束时, 进行判断参数是否合理
                 if (item.legalValue && paramsObj[item.alias]) {
                     if (!Object.keys(item.legalValue).includes(paramsObj[item.alias].toString())) {
                         
@@ -256,9 +277,11 @@ const useCommand = (): UseCommandHook => {
         // 是否存在子命令
         let subCommands = resultCommand.subCommands;
         if (subCommands.length > 0 && inpArr.length > 1) {
-            return `${mainCommand} ${setHint(inpArr.slice(1).join(' '), subCommands)}`
+            let subHint = setHint(inpArr.slice(1).join(' '), subCommands);
+            if (subHint !== '') {
+                return `${mainCommand} ${subHint}`
+            }
         }
-        
         return commandUseFunc(resultCommand);
     }
 

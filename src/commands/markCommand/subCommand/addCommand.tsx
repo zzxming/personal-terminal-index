@@ -1,3 +1,4 @@
+import { getURLDomain } from "..";
 import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../../assets/js/const";
 import { Command, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
@@ -27,7 +28,7 @@ const addMark: Command = {
         const paramVal: { [key: string]: string } = {}
         paramVal['url'] = _[_.length - 1];
         paramVal['name'] = _.slice(0, _.length - 1).join(' ')
-        console.log(paramVal)
+        // console.log(paramVal)
 
         let preMark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
         if (!preMark) {
@@ -60,34 +61,7 @@ const addMark: Command = {
 }
 
 
-/**
- * 获取网址的域名
- * @param url 网址url
- * @returns 
- */
- const getURLDomain = (url: string): string => {
-    // console.log(url)
-    let link = url;
 
-    // 保证网址存在http
-    if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        link = `https://${link}`
-    }
-    // 除去http前缀寻找网址完整域名
-    if (link.startsWith('http://')) {
-        link = link.split('http://')[1];
-    }
-    else if (link.startsWith('https://')) {
-        link = link.split('https://')[1];
-    }
-    let i = link.indexOf('/');
-    if (i !== -1) {
-        link = link.slice(0, i);
-    }
-    // console.log(link)
-
-    return link
-}
 
 
 export {

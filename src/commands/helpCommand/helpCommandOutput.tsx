@@ -11,7 +11,7 @@ interface LegalValueTable {
 
 const commandList = () => (
     <div className={css.command_list} key={new Date().getTime() + 'help'}>
-        <p className={css.command_list_txt}>命令列表:</p>
+        <p className={css.command_list_desc}>命令列表:</p>
         {
             // 排序
             commandMap.sort((a, b) => a.name > b.name ? 1 : -1).map(item => {
@@ -53,47 +53,60 @@ const commandDetail = (command: Command) => {
         return (<Table pagination={false} dataSource={dataSource} columns={columns} scroll={{ y: 240 }} style={{overflowY: 'auto'}} />)
     }
     
-    return (
-        <div key={`command help ${name} result ${new Date().getTime()}`}>
-            <p className={css.command_list_txt}>命令: {desc}</p>
-            <p className={css.command_list_txt}>用法: {commandUseFunc(command)}</p>
-            {
-                params.length > 0 ? 
-                    <div>
-                        <p className={css.command_list_txt}>参数: </p>
-                        <ul className={css.command_option_list}>
+    const paramsCreator = () => {
+        return (
+            <>
+                {
+                    params.length > 0 ? 
+                        <div className={css.command_param}>
+                            <p className={css.command_list_desc}>参数: </p>
+                            <ul className={css.command_detail}>
+                                {
+                                    params.map(param => (
+                                        <li key={param.key}>{param.key} {param.required ? '必填' : '可选'} {param.desc}</li>
+                                    ))
+                                }
+                            </ul>
+                        </div> : 
+                        ''
+                }
+            </>
+        )
+    }
+
+    const subCommandCreator = () => {
+        return (
+            <>
+                {
+                    subCommands.length > 0 ?
+                    <div className={css.command_sub_list}>
+                        <p className={css.command_list_desc}>子命令: </p>
+                        <ul className={css.command_detail}>
                             {
-                                params.map(param => (
-                                    <li>{param.key} {param.required ? '必填' : '可选'} {param.desc}</li>
+                                subCommands.map(subCommand => (
+                                    <li key={`${name} ${subCommand.name}`}>
+                                        <div className={css.command_sub}>
+                                            {commandDetail(subCommand)}
+                                        </div>
+                                    </li>
                                 ))
                             }
                         </ul>
                     </div> : 
                     ''
-            }
-            {
-                subCommands.length > 0 ?
-                <div>
-                    <p className={css.command_list_txt}>子命令: </p>
-                    <ul className={css.command_option_list}>
-                        {
-                            subCommands.map(subCommand => (
-                                <li>
-                                    <p className={css.command_list_txt}>{subCommand.name} {subCommand.desc}</p>
-                                    <p className={css.command_list_txt}>用法: {name} {commandUseFunc(subCommand)}</p>
-                                </li>
-                            ))
-                        }
-                    </ul>
-                </div> : 
-                ''
-            }
-            
-            {
-                options.length > 0 ? 
-                    <div>
-                        <p className={css.command_list_txt}>选项: </p>
-                        <ul className={css.command_option_list}>
+                }
+            </>
+        )
+    }
+
+    const optionCreator = () => {
+        return (
+            <>
+                {
+                    options.length > 0 ? 
+                    <div className={css.command_option}>
+                        <p className={css.command_list_desc}>选项: </p>
+                        <ul className={css.command_detail}>
                             {
                                 options.map(option => (
                                     <li key={option.key}>
@@ -111,7 +124,18 @@ const commandDetail = (command: Command) => {
                         </ul>
                     </div> :
                     ''
-            }
+                }
+            </>
+        )
+    }
+
+    return (
+        <div key={`command help ${name} result ${new Date().getTime()}`} className={css.command_help}>
+            <p className={css.command_list_desc}>命令: {desc}</p>
+            <p className={css.command_list_desc}>用法: {commandUseFunc(command)}</p>
+            { paramsCreator() }
+            { subCommandCreator() }
+            { optionCreator() }
         </div>
     )
 }
