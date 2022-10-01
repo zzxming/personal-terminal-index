@@ -77,10 +77,14 @@ const fanyiCommand: Command = {
             return err.response?.statusText || err.message
         }
         // console.log(result)
-        const data = result.data.data;
-        // console.log(data)
-        if ((data as FanyiRejResult).error_code) {
-            const { error_code, error_message } = data as FanyiRejResult;
+        if (result.data.code !== 0) {
+            console.log(result.data?.message)
+            return '网络错误'
+        }
+
+        const rejData = result.data.data as FanyiRejResult
+        if (rejData.error_code) {
+            const { error_code, error_message } = rejData;
             // console.log(data.error_msg);
             return (
                 <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
@@ -89,7 +93,8 @@ const fanyiCommand: Command = {
             )
         }
         else {
-            const { trans_result, to, from } = data as FanyiResResult;
+            const resData = result.data.data as FanyiResResult;
+            const { trans_result, to, from } = resData;
             return (
                 <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
                     从{lang[from]}: {trans_result[0].src}，翻译成{lang[to]}: {trans_result[0].dst}

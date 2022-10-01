@@ -22,7 +22,9 @@ const biliSearch = async ({keywords, page, pageSize = 42}) => {
             result: data.data.data.result ?? []
         }
     })
-    .catch(e => e.code)
+    .catch(e => {
+        throw e;
+    })
 }
 
 // b站搜索登录用户和未登录用户搜索结果是不同的, 登录用户会传递 cookie 中的 SESSDATA, 此 cookie 控制搜索结果
@@ -50,7 +52,9 @@ const biliSearchType = async ({keywords, page, pageSize = 42, search_type}) => {
             result: result ?? []
         }
     })
-    .catch(e => e.code)
+    .catch(e => {
+        throw e;
+    })
 }
 
 const biliPic = async (pic) => {
@@ -58,7 +62,9 @@ const biliPic = async (pic) => {
         responseType: 'arraybuffer'
     })
     .then(data => `data:${data.headers['content-type']};base64,${new Buffer.from(data.data, 'binary').toString('base64')}`)
-    .catch(e => e.code)
+    .catch(e => {
+        throw e;
+    })
 }
 
 module.exports = {

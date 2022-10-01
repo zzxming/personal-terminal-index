@@ -11,13 +11,11 @@ const backgroundImageUrl = async (type) => {
     // console.log(type)
     const imageApiUrl = `https://api.btstu.cn/sjbz/api.php?lx=${type}&format=json`;
 
-    try {
-        return axios.get(imageApiUrl).then(res => res.data.imgurl)
-    }
-    catch(e) {
-        console.log(e);
-        return '';
-    }
+    return await axios.get(imageApiUrl)
+    .then(res => res.data.imgurl)
+    .catch(e => {
+        throw e;
+    })
     // return axios.get(imageApiUrl).then(res => res.data.imgurl);
 }
 

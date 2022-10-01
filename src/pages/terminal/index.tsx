@@ -1,12 +1,12 @@
-import { useRef, useLayoutEffect, useState, useEffect, ChangeEvent } from "react";
+import { useRef, useLayoutEffect, useState, useEffect, ChangeEvent, StyleHTMLAttributes } from "react";
 import useBackgroundImage from "../../hooks/backgroundImage";
 import useCommand from "../../hooks/command";
 import css from './index.module.css'
 import { throttle } from 'lodash'
 import { MarkNav } from "../../commands/markCommand/markCommandOutput";
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
+import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
 import { localStorageGetItem } from "../../utils/localStorage";
-import { MarkData } from "../../interface/interface";
+import { ConfigData, MarkData } from "../../interface/interface";
 
 const Terminal: React.FC = () => {
 
@@ -17,19 +17,30 @@ const Terminal: React.FC = () => {
     const view = useRef<HTMLDivElement>(null);
     const inp = useRef<HTMLInputElement>(null);
     const [inputMargin, setInputMargin] = useState<number>(0);
+    const [outputStyle, setOuptputStyle] = useState<React.CSSProperties>({});
     
-    // 更新mark
+    // localstorage更新
     useEffect(() => {
         markChangedVisible();
-        window.addEventListener(LOCALSTORAGEMARKEVENT, markChangedVisible)
+        configChange();
+
+        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], markChangedVisible);
+        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], configChange);
         return () => {
-            window.removeEventListener(LOCALSTORAGEMARKEVENT, markChangedVisible)
+            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], markChangedVisible);
+            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], configChange);
         }
     }, []);
 
+    // localstorage中mark初始化及更新处理函数
     const markChangedVisible = () => {
         let mark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
         setInputMargin((mark.show ? 58 : 0))
+    }
+    // localstorage中config初始化及更新处理函数
+    const configChange = () => {
+        let configData = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
+        setOuptputStyle(configData ? configData.style : {});
     }
   
     // 保持输入会在屏幕内,最下方
@@ -130,12 +141,12 @@ const Terminal: React.FC = () => {
     return (
         <>
             <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
-                <div className={css.terminal_mask} onClick={focusInput}>
+                <div className={css.terminal_mask} onClick={focusInput} style={outputStyle}>
                     <MarkNav />
                     <div ref={view} className={css.terminal_command} style={{top: `${inputMargin}px`,height: `calc(100% - ${inputMargin}px)`}}>
                         {
                             commands && commands.map((item) => (
-                                <div className={css.command_result} key={'local' + item.key}>
+                                <div key={'local' + item.key} className={css.command_result}>
                                     {
                                         item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
                                     }

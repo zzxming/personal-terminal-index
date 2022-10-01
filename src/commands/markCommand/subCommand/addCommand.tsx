@@ -1,5 +1,5 @@
 import { getURLDomain } from "..";
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../../assets/js/const";
+import { LOCALSTORAGEMARK } from "../../../assets/js/const";
 import { Command, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
@@ -54,7 +54,7 @@ const addMark: Command = {
             url,
             icon: iconUrl
         }]
-        localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data }, LOCALSTORAGEMARKEVENT)
+        localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data })
         
         return '添加成功'
     }

@@ -4,7 +4,7 @@ import { Mark, MarkData  } from "../../interface/interface"
 import css from './index.module.css'
 import { useEffect, useState } from "react";
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
+import { LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
 
 const MarkNav: React.FC = () => {
 
@@ -14,9 +14,9 @@ const MarkNav: React.FC = () => {
     // 监听事件, 使mark同步
     useEffect(() => {
         getMark();
-        window.addEventListener(LOCALSTORAGEMARKEVENT, getMark);
+        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], getMark);
         return () => {
-            window.removeEventListener(LOCALSTORAGEMARKEVENT, getMark);
+            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], getMark);
         }
     }, []);
     /** 获取最新mark */
@@ -24,6 +24,7 @@ const MarkNav: React.FC = () => {
         let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
         // console.log(data)
         if (!data) {
+            // 初始化localstorage的mark
             localStorageSetItem(LOCALSTORAGEMARK, {show: true, data: []});
             setShow(true);
             setMarks([]);

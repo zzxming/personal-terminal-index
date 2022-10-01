@@ -54,6 +54,9 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
             // console.log(err)
             return err.response?.statusText || err.message
         }
+        if (result.data.code !== 0) {
+            return result.data.message
+        }
         // console.log(result)
         const { numPages, numResults, pagesize, page, result: datalist } = result.data.data;
         if (!datalist) {
@@ -154,8 +157,11 @@ const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
             // console.log(err)
             return err.response?.statusText || err.message
         }
-        else if (result) {
-            // console.log(result)
+        if (result) {
+            if (result.data.code !== 0) {
+                // console.log(result)
+                return '网络错误'
+            }
             setBase64Pic(result.data.data);
         }
     }, [pic]);

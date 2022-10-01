@@ -1,4 +1,6 @@
-import { Command } from "../../interface/interface";
+import { Command, ConfigData, openType } from "../../interface/interface";
+import { clearCommand } from "./subComand/clearCommand";
+import { colorCommand } from "./subComand/colorCommand";
 import { openCommand } from "./subComand/openCommand";
 
 
@@ -12,18 +14,36 @@ const configCommand: Command = {
             required: true
         }
     ],
-    options: [],
+    options: [
+        {
+            key: 'list',
+            alias: 'l',
+            desc: '列表形式展示所有配置属性',
+            valueNeeded: false
+        }
+    ],
     subCommands: [
-        openCommand
+        openCommand,
+        colorCommand,
+        clearCommand,
     ],
     action(args, commandHandle) {
-        // 不会进入
         console.log(args)
+        const { list } = args;
+
 
         return ''
     }
 }
 
+const initValLocalStorageConfig = (): ConfigData => {
+    return {
+        open: openType.blank,
+        style: {}
+    }
+}
+
 export {
-    configCommand
+    configCommand,
+    initValLocalStorageConfig
 }

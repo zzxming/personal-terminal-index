@@ -10,9 +10,9 @@ export interface AxiosResult<T> {
     data: {
         code: number
         data: T
+        message?: string
     }
 }
-
 /**
  * 
  * @param {*} keywords 

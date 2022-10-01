@@ -1,4 +1,4 @@
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../../assets/js/const";
+import { LOCALSTORAGEMARK } from "../../../assets/js/const";
 import { Command, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
@@ -29,7 +29,7 @@ const delMark: Command = {
             if (i !== -1) {
                 data.splice(i ,1);
             }
-            localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data }, LOCALSTORAGEMARKEVENT)
+            localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data })
         }
         
         return '删除成功'

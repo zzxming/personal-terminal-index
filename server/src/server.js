@@ -37,10 +37,7 @@ class Server {
                     message: e.message
                 }
             }
-            // 如果没有返回值, 则是在处理函数中提前返回
-            if (result.data) {
-                res.send(result);
-            }
+            res.send(result);
         }
         this.app[method](routeOption.path, handler);
     }

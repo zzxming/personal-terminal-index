@@ -4,18 +4,14 @@ import { localStorageGetItem, localStorageSetItem } from "../../../utils/localSt
 import { initValLocalStorageConfig } from "..";
 
 
-const openCommand: Command = {
-    name: 'open',
+const colorCommand: Command = {
+    name: 'color',
     desc: '打开页面方式',
     params: [
         {
-            key: 'type',
-            desc: '打开方式',
+            key: 'color',
+            desc: '颜色十六进制值',
             required: true,
-            legalValue: {
-                'self': '本页打开',
-                'blank': '新标签页打开'
-            }
         }
     ],
     options: [],
@@ -28,12 +24,15 @@ const openCommand: Command = {
         if (!config) {
             config = initValLocalStorageConfig();
         }
-        localStorageSetItem(LOCALSTORAGECONFIG, {...config, open: _[0]});
+        let style = { ...config.style, color: _.join(' ') }
+        // console.log( { ...config, style })
+
+        localStorageSetItem(LOCALSTORAGECONFIG, { ...config, style });
 
         return '配置成功'
     }
 }
 
 export {
-    openCommand
+    colorCommand
 }

@@ -1,8 +1,7 @@
-import { Fragment } from 'react';
 import {
-    AxiosResult,
     getNeteaseMusic,
     getNeteaseMusicList,
+    AxiosResult,
     MusicResult,
 } from '../../assets/js/api'
 import { Command } from '../../interface/interface';
@@ -64,7 +63,11 @@ const musicCommand: Command = {
                 // console.log(err)
                 return err.response?.statusText || err.message
             }
-            else if (result) {
+            if (result) {
+                if (result.data.code !== 0) {
+                    // console.log(result)
+                    return '网络错误'
+                }
                 // console.log(result)
                 const songs = result.data.data;
                 if (songs.length < 1) {

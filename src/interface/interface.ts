@@ -105,6 +105,10 @@ export interface Mark {
 }
 // mark end
 
+export interface ConfigData {
+    style: React.CSSProperties
+    open: openType
+}
 
 
 

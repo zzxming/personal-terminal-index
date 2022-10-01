@@ -27,7 +27,7 @@
 .command_result {
   display: flex;
   align-items: flex-start;
-    justify-content: flex-start;
+  justify-content: flex-start;
   width: 100%;
 }
 .input_command {
@@ -37,7 +37,6 @@
   outline: none;
   line-height: 30px;
   font-size: 20px;
-  color: #ddd;
   background-color: transparent;
   font-family: inherit;
 }

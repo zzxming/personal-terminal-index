@@ -112,6 +112,7 @@
 }
 .video_info_title_link {
     display: inline-block;
+    width: 100%;
     height: 44px;
     color: #000;
     cursor: pointer;
@@ -132,8 +133,11 @@
     margin: 0;
 }
 .video_info_sub {
+    position: absolute;
+    bottom: 0;
     margin: 4px 0;
-    height: 16px;
+    height: 18px;
+    line-height: 18px;
     font-size: 14px;
 }
 .video_info_sub_link {

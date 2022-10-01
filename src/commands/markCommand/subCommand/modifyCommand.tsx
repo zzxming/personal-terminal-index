@@ -1,5 +1,5 @@
 import { getURLDomain } from "..";
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../../assets/js/const";
+import { LOCALSTORAGEMARK } from "../../../assets/js/const";
 import { Command, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
@@ -67,7 +67,7 @@ const modifyMark: Command = {
             icon: iconUrl
         });
 
-        localStorageSetItem(LOCALSTORAGEMARK, {...markData, data: [...marks]}, LOCALSTORAGEMARKEVENT);
+        localStorageSetItem(LOCALSTORAGEMARK, {...markData, data: [...marks]});
 
         return '修改成功'
     }

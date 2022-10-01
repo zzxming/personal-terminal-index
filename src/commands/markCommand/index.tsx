@@ -1,6 +1,6 @@
 import { Avatar, Card } from "antd";
 import { GlobalOutlined } from '@ant-design/icons';
-import { LOCALSTORAGEMARK, LOCALSTORAGEMARKEVENT } from "../../assets/js/const";
+import { LOCALSTORAGEMARK } from "../../assets/js/const";
 import { CommandResultListOutput } from "../../components/commandListOutput";
 import { Command, Mark, MarkData } from "../../interface/interface";
 import { localStorageSetItem, localStorageGetItem } from "../../utils/localStorage";
@@ -48,33 +48,32 @@ const markCommand: Command= {
 
         const { _, show, list } = args;
         if (show) {
-            localStorageSetItem(LOCALSTORAGEMARK, {...localStorageGetItem(LOCALSTORAGEMARK), show: show === 'on' ? true : false}, LOCALSTORAGEMARKEVENT)
+            localStorageSetItem(LOCALSTORAGEMARK, {...localStorageGetItem(LOCALSTORAGEMARK), show: show === 'on' ? true : false})
             return '配置成功'
         }
         if (list) {
             let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
             
             return (
-                <div key={`mark result ${new Date().getTime()}`}>
-                    <CommandResultListOutput<Mark> 
-                        data={data.data} 
-                        render={(item, index) => (
-                            <li className={css.mark_list_item}>
-                                <Card 
-                                    type="inner" 
-                                    title={
-                                        <span>
-                                            <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
-                                            {item.title}
-                                        </span>
-                                    }
-                                >
-                                    <span className={css.mark_list_item_title} title={item.url}>{item.url}</span>
-                                </Card>
-                            </li>
-                        )} 
-                    />
-                    </div>
+                <CommandResultListOutput<Mark> 
+                    key={`mark result ${new Date().getTime()}`}
+                    data={data.data} 
+                    render={(item, index) => (
+                        <li className={css.mark_list_item}>
+                            <Card 
+                                type="inner" 
+                                title={
+                                    <span>
+                                        <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
+                                        {item.title}
+                                    </span>
+                                }
+                            >
+                                <span className={css.mark_list_item_title} title={item.url}>{item.url}</span>
+                            </Card>
+                        </li>
+                    )} 
+                />
             )
         }
 

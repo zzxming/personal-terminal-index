@@ -43,8 +43,8 @@ const backgroundCommand: Command = {
             // console.log(err)
             return err.response?.statusText || err.message
         }
-        if (result.data.data === '') {
-            return '请求失败';
+        if (result.data.code !== 0) {
+            return '网络错误';
         }
         localStorageSetItem(LOCALSTORAGEBGURL, result.data.data);
         return '更换成功';

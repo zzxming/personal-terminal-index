@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { LOCALSTORAGEBGURL, LOCALSTORAGEBGURLEVENT } from "../assets/js/const";
+import { LOCALSTORAGEBGURL, LOCALSTORAGEEVENTMAP } from "../assets/js/const";
 import { localStorageGetItem, localStorageSetItem } from "../utils/localStorage";
 
 
@@ -9,7 +9,7 @@ const useBackgroundImage = () => {
 
     const setbackgroundImage = useCallback((imgurl: string) => {
         // console.log(imgurl)
-        localStorageSetItem(LOCALSTORAGEBGURL, imgurl, LOCALSTORAGEBGURLEVENT);
+        localStorageSetItem(LOCALSTORAGEBGURL, imgurl);
         setImgurl(imgurl);
         return '更换成功';
     }, []);
@@ -17,13 +17,14 @@ const useBackgroundImage = () => {
     useEffect(() => {
         // 要监听到localstorage的变化
         setbackgroundImage(localStorageGetItem(LOCALSTORAGEBGURL) || '');
+
         function updateBg() {
             // console.log(localStorage.getItem(LOCALSTORAGEBGURL))
             setImgurl(localStorageGetItem(LOCALSTORAGEBGURL) || '');
         }
-        window.addEventListener(LOCALSTORAGEBGURLEVENT, updateBg);
+        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEBGURL], updateBg);
         return () => {
-            window.removeEventListener(LOCALSTORAGEBGURLEVENT, updateBg);
+            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEBGURL], updateBg);
         }
     }, [])
 

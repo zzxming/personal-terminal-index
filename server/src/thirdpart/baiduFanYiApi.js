@@ -24,7 +24,11 @@ const translate = async (keywords, config) => {
             q: keywords,
             from, to, appid, salt, sign
         }
-    }).then(res => res.data);
+    })
+    .then(res => res.data)
+    .catch(e => {
+        throw e;
+    });
 }
 
 module.exports = {
