@@ -16,6 +16,7 @@ export interface CommandParamArgs {
     [x: string]: string | boolean | number | string[],
     _: string[]
 }
+// setCommandHint 和 completionCommand 两个函数中的 commands 类型使用 Command[] 有问题, 导致 commandMap 没法传入, 使用 typeof 获取类型
 export interface UseCommandHook {
     commands: Command[]
     historyCommands: HistoryCommand[]
@@ -23,9 +24,11 @@ export interface UseCommandHook {
     clearCommand: () => void
     setHistoryCommandsIndex: React.Dispatch<React.SetStateAction<number>>
     excuteCommand: (command: string, commandHandle: UseCommandHook) => void
-    setHint: (str: string) => string
+    setCommandHint: (str: string, isCompletion?: boolean, commands?: typeof commandMap) => string
     pushCommands: (command: React.ReactElement | string, isResult: boolean) => void
 }
+
+
 const useCommand = (): UseCommandHook => {
     // commands内存jsx或者文本命令,history内存string(命令原文本)
     const [commands, setCommands] = useState<Command[]>([]);
@@ -40,7 +43,7 @@ const useCommand = (): UseCommandHook => {
         setHistoryCommandsIndex(historyCommands.length);
     }, [historyCommands]);
 
-    function pushCommands(command: React.ReactElement | string, isResult: boolean) {
+    const pushCommands = (command: React.ReactElement | string, isResult: boolean) => {
         // 空命令直接输出
         if (command === '') {
             setCommands(commands => {
@@ -84,7 +87,7 @@ const useCommand = (): UseCommandHook => {
      * 新增历史命令
      * @param {*} command 命令字符串
      */
-    function pushHistoryCommands(command: string) {
+    const pushHistoryCommands = (command: string) => {
         setHistoryCommands(commands => {
             return [...commands, { txt: command }]
         });
@@ -92,7 +95,7 @@ const useCommand = (): UseCommandHook => {
     /**
      * 清屏
      */
-    function clearCommand() {
+    const clearCommand = () => {
         setCommands([]);
     }
 
@@ -102,7 +105,7 @@ const useCommand = (): UseCommandHook => {
      * @param option 命令的 options 选项, 若有则按 option 中的key返回
      * @returns 解析完成后对象, _为输入参数
      */
-    function paramParse(commands: string[], option?: CommandOption[]) {
+    const paramParse = (commands: string[], option?: CommandOption[]) => {
         const params: CommandParamArgs = {
             _: [],
         };
@@ -154,7 +157,7 @@ const useCommand = (): UseCommandHook => {
      * @param command 命令字符串
      * @param commandHandle command hook
      */
-    async function excuteCommand(command: string, commandHandle: UseCommandHook) {
+    const excuteCommand = async (command: string, commandHandle: UseCommandHook) => {
         console.log('excute', command)
         if (command.trim() === '') {
             pushCommands(command, false);
@@ -254,11 +257,11 @@ const useCommand = (): UseCommandHook => {
      * 
      * 显示的提示文字
      * @param str 当前输入命令
+     * @param isCompletion 是否为命令补全
      * @param commands 查看命令范围
      * @returns 提示文字
      */
-    function setHint(str: string, commands = commandMap): string {
-
+    const setCommandHint = (str: string, isCompletion: boolean = false, commands = commandMap): string => {
         str = str.trim();
         // 空字符返回
         if (str === '') {
@@ -266,25 +269,24 @@ const useCommand = (): UseCommandHook => {
         }
         let inpArr = str.split(' ');
         // 主命令输入
-        let mainCommand = inpArr[0];
-        let resultCommand = commands.filter(command => {
-            return command.name.startsWith(mainCommand);
+        let mainCommandInp = inpArr[0];
+        let mainCommand = commands.filter(command => {
+            return command.name.startsWith(mainCommandInp);
         })[0];
 
-        if (!resultCommand) {
+        if (!mainCommand) {
             return '';
         }
         // 是否存在子命令
-        let subCommands = resultCommand.subCommands;
+        let subCommands = mainCommand.subCommands;
         if (subCommands.length > 0 && inpArr.length > 1) {
-            let subHint = setHint(inpArr.slice(1).join(' '), subCommands);
+            let subHint = setCommandHint(inpArr.slice(1).join(' '), isCompletion, subCommands);
             if (subHint !== '') {
-                return `${mainCommand} ${subHint}`
+                return isCompletion ? `${mainCommand.name} ${subHint}` : `${mainCommandInp} ${subHint}`
             }
         }
-        return commandUseFunc(resultCommand);
+        return isCompletion ? mainCommand.name : commandUseFunc(mainCommand);
     }
-
 
     return {
         commands,
@@ -293,8 +295,8 @@ const useCommand = (): UseCommandHook => {
         clearCommand,
         setHistoryCommandsIndex,
         excuteCommand,
-        setHint,
-        pushCommands
+        setCommandHint,
+        pushCommands,
     }
 }
 

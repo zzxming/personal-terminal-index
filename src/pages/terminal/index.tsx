@@ -12,7 +12,7 @@ const Terminal: React.FC = () => {
 
     const { imgurl } = useBackgroundImage();
     const commandHandle = useCommand();
-    const { commands, historyCommands, historyCommandsIndex, setHint, setHistoryCommandsIndex, excuteCommand } = commandHandle;
+    const { commands, historyCommands, historyCommandsIndex, setCommandHint, setHistoryCommandsIndex, excuteCommand } = commandHandle;
     const [hintTxt, setHintTxt] = useState('');
     const view = useRef<HTMLDivElement>(null);
     const inp = useRef<HTMLInputElement>(null);
@@ -120,6 +120,11 @@ const Terminal: React.FC = () => {
                 throttleKeyPressEvnet();
                 break;
             }
+            case 'Tab': {
+                    e.preventDefault();
+                    completeCommandInput();
+                break;
+            }
             default: {
                 break;
             }
@@ -129,14 +134,26 @@ const Terminal: React.FC = () => {
     function keyPressEvent() {
         // console.log(inp.current)
         if (inp.current) {
-            let commandStr = inp.current?.value;
+            let commandStr = inp.current.value;
             // console.log(commandStr)
-            let getCommand = setHint(commandStr);
+            let getCommand = setCommandHint(commandStr);
             // console.log(getCommand)
             setHintTxt(getCommand as any);
         }
     }
     const throttleKeyPressEvnet = throttle(keyPressEvent, 1000);
+    /** 命令输入补全 */
+    function completeCommandInput() {
+        if (inp.current) {
+            let inpStr = inp.current.value;
+            let completeCommandName = setCommandHint(inpStr, true);
+            // 如果返回补全命令比输入命令短, 代表输入有参数, 不需要补全
+            if (completeCommandName.length > inpStr.length) {
+                inp.current.value = completeCommandName;
+            }
+        }
+    }
+
 
     return (
         <>
