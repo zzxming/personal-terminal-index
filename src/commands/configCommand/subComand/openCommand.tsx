@@ -25,9 +25,6 @@ const openCommand: Command = {
         const { _ } = args;
 
         let config = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
-        if (!config) {
-            config = initValLocalStorageConfig();
-        }
         localStorageSetItem(LOCALSTORAGECONFIG, {...config, open: _[0]});
 
         return '配置成功'

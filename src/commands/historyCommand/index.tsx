@@ -1,7 +1,6 @@
 import { CommandResultListOutput } from '../../components/commandListOutput';
 import { HistoryCommand } from '../../hooks/command';
 import { Command } from '../../interface/interface';
-import style from './index.module.css'
 
 const historyCommand: Command = {
     name: 'history',
@@ -25,20 +24,20 @@ const historyCommand: Command = {
         const { historyCommands } = commandHandle;
         const sortHistoryCommands = [...historyCommands].reverse();
         const showHistoryCommands = num === 0 ? sortHistoryCommands : sortHistoryCommands.slice(0, num);
+        showHistoryCommands.reverse();
 
         // console.log(sortHistoryCommands)
 
         return (
-            <div key={`history result ${new Date().getTime()}`} className={style.history}>
-                <CommandResultListOutput<HistoryCommand> 
-                    data={showHistoryCommands} 
-                    render={(item, index) => (
-                        <li className={style.history_item}>
-                            {index + 1} {item.txt}
-                        </li>
-                    )} 
-                />
-            </div>
+            <CommandResultListOutput<HistoryCommand> 
+                key={`history result ${new Date().getTime()}`}
+                data={showHistoryCommands} 
+                render={(item, index) => (
+                    <li>
+                        {index + 1} {item.txt}
+                    </li>
+                )} 
+            />
         )
     }
 }

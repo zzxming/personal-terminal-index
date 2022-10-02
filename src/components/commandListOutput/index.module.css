@@ -2,4 +2,7 @@
 .txt {
     line-height: 30px;
 }
-
+:global(.ant-list).list_item {
+    font-size: 18px;
+    color: #fff;
+}

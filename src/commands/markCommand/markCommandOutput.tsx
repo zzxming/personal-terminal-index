@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import { Avatar, List } from "antd"
 import { GlobalOutlined } from '@ant-design/icons';
-import { Mark, MarkData  } from "../../interface/interface"
+import { ConfigData, Mark, MarkData  } from "../../interface/interface"
 import css from './index.module.css'
-import { useEffect, useState } from "react";
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
-import { LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
+import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
 
 const MarkNav: React.FC = () => {
 
@@ -15,23 +15,26 @@ const MarkNav: React.FC = () => {
     useEffect(() => {
         getMark();
         window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], getMark);
+        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], getMark);
         return () => {
             window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], getMark);
+            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], getMark);
         }
     }, []);
     /** 获取最新mark */
     const getMark = () => {
-        let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+        let { data } = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+        let { mark } = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
         // console.log(data)
         if (!data) {
             // 初始化localstorage的mark
-            localStorageSetItem(LOCALSTORAGEMARK, {show: true, data: []});
-            setShow(true);
+            localStorageSetItem(LOCALSTORAGEMARK, {data: []});
+            setShow(mark);
             setMarks([]);
             return;
         }
-        setShow(data.show);
-        setMarks(data.data);
+        setShow(mark);
+        setMarks(data);
     }
 
     return (

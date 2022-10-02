@@ -29,8 +29,8 @@ export interface CommandOption {
         [key: string | number]: string
     }
 }
-// 获取command中option的legalValue的类型
-export type legalValueType<T extends object, K extends keyof T> = T[K];
+// 获取对象中某属性的数据类型
+export type objectValueType<T extends object, K extends keyof T> = T[K];
 // command 接口 end
 
 
@@ -94,7 +94,6 @@ export interface LogData {
 
 // mark start
 export interface MarkData {
-    show: boolean
     data: Mark[]
 }
 export interface Mark {
@@ -105,14 +104,22 @@ export interface Mark {
 }
 // mark end
 
+// config start
 export interface ConfigData {
+    /** 终端样式 */
     style: React.CSSProperties
+    /** 页面打开方式 */
     open: openType
+    /** mark是否持续展示 */
+    mark: boolean
+    /** 背景图片路径 */
+    bgurl: string
+    /** time是否持续展示 */
+    time: boolean
 }
-
-
-
+/** 页面打开方式 */
 export enum openType {
     self = 'self',
     blank = 'blank'
 }
+// config end

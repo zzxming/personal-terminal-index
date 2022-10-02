@@ -2,7 +2,7 @@ import css from './index.module.css'
 import { commandMap } from '../registerCommand'
 import { commandUseFunc } from '..'
 import { Table, TableColumnsType } from 'antd'
-import { Command, CommandOption, legalValueType } from '../../interface/interface'
+import { Command, CommandOption, objectValueType } from '../../interface/interface'
 
 interface LegalValueTable {
     key: string
@@ -34,7 +34,7 @@ const commandDetail = (command: Command) => {
     const { name, desc, params, options, subCommands } = command;
 
     // 考虑一行展示两个参数, 即 '参数 描述 参数 描述'
-    const legalTable = (legalValue: legalValueType<CommandOption, 'legalValue'>) => {
+    const legalTable = (legalValue: objectValueType<CommandOption, 'legalValue'>) => {
         if (!legalValue) return ('');
         const columns: TableColumnsType<LegalValueTable> = [
             { title: '参数', dataIndex: 'key' },

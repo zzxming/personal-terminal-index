@@ -7,6 +7,7 @@ import { MarkNav } from "../../commands/markCommand/markCommandOutput";
 import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
 import { localStorageGetItem } from "../../utils/localStorage";
 import { ConfigData, MarkData } from "../../interface/interface";
+import { TimeCount } from "../../commands/timeCommand/timeCommandOutput";
 
 const Terminal: React.FC = () => {
 
@@ -21,26 +22,19 @@ const Terminal: React.FC = () => {
     
     // localstorage更新
     useEffect(() => {
-        markChangedVisible();
         configChange();
 
-        window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], markChangedVisible);
         window.addEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], configChange);
         return () => {
-            window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGEMARK], markChangedVisible);
             window.removeEventListener(LOCALSTORAGEEVENTMAP[LOCALSTORAGECONFIG], configChange);
         }
     }, []);
 
-    // localstorage中mark初始化及更新处理函数
-    const markChangedVisible = () => {
-        let mark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
-        setInputMargin((mark.show ? 58 : 0))
-    }
     // localstorage中config初始化及更新处理函数
     const configChange = () => {
-        let configData = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
-        setOuptputStyle(configData ? configData.style : {});
+        let { style, mark } = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
+        setOuptputStyle(style ? style : {});
+        setInputMargin((mark ? 58 : 0))
     }
   
     // 保持输入会在屏幕内,最下方
@@ -160,6 +154,7 @@ const Terminal: React.FC = () => {
             <div className={css.terminal} onClick={focusInput} style={{backgroundImage: `url(${imgurl})`}}>
                 <div className={css.terminal_mask} onClick={focusInput} style={outputStyle}>
                     <MarkNav />
+                    <TimeCount />
                     <div ref={view} className={css.terminal_command} style={{top: `${inputMargin}px`,height: `calc(100% - ${inputMargin}px)`}}>
                         {
                             commands && commands.map((item) => (
@@ -173,6 +168,7 @@ const Terminal: React.FC = () => {
                         }
                         <div className={css.terminal_input}>
                             <span className={css.terminal_user}>[local]:</span>
+                            {/* 多行输入 */}
                             <input ref={inp} className={css.input_command} onKeyDown={keydownEvent} onChange={throttleKeyPressEvnet} />
                         </div>
                         {

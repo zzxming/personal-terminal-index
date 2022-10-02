@@ -52,10 +52,12 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
         const [err, result] = await getBiliSearchTypeResult({keywords, page: toPage, pageSize, search_type: searchType});
         if (err) {
             // console.log(err)
-            return err.response?.statusText || err.message
+            setLoading(false);
+            return err.response?.statusText || err.message;
         }
         if (result.data.code !== 0) {
-            return result.data.message
+            setLoading(false);
+            return result.data.message;
         }
         // console.log(result)
         const { numPages, numResults, pagesize, page, result: datalist } = result.data.data;

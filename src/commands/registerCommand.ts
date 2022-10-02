@@ -11,6 +11,7 @@ import { markCommand } from './markCommand';
 import { gotoCommand } from './gotoCommand';
 import { baiduCommand } from './baiduCommand';
 import { configCommand } from './configCommand';
+import { timeCommand } from './timeCommand';
 
 const commandMap: Command[] = [
     musicCommand,
@@ -25,6 +26,7 @@ const commandMap: Command[] = [
     gotoCommand,
     baiduCommand,
     configCommand,
+    timeCommand,
 ]
 
 export {

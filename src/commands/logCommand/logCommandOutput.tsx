@@ -237,7 +237,7 @@ const GetLogTable: React.FC = () => {
             do {
                 date = moment(moment(date, 'YYYY-MM-DD').valueOf() + (24* 3600 * 1000)).format('YYYY-MM-DD');
             } while(data[date])
-            console.log('当前日期存在', date)
+            console.log(`日期 ${date} 存在`)
         }
         let newData = { ...data }
         newData[date] = [];

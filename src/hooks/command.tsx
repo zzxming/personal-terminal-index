@@ -109,7 +109,7 @@ const useCommand = (): UseCommandHook => {
         const params: CommandParamArgs = {
             _: [],
         };
-
+        // console.log(commands)
         for (let i = 0; i < commands.length; i++) {
             if (commands[i] === '') continue;
 
@@ -134,7 +134,7 @@ const useCommand = (): UseCommandHook => {
                 } else {
                     // 匹配带空格的参数值
                     // 如: mark modify 原来的名字 原来名字第二段 -n 第一段 第二段
-                    // 保证-n获取的参数值是'第一段 第二段', _匹配的值是['原来的名字', '原来名字第二段']
+                    // 保证 -n 获取的参数值是 '第一段 第二段' , _ 匹配的值是 ['原来的名字', '原来名字第二段']
                     let count = 1;
                     let paramVal: string[] = [];
                     do {
@@ -143,7 +143,8 @@ const useCommand = (): UseCommandHook => {
                     } while (commands[i + count] && !commands[i + count].startsWith('-'))
                     params[alias] = paramVal.join(' ');
                     commandOption && (params[commandOption.key] = paramVal.join(' '));
-                    i += count;
+                    // i + count 会越界或得到参数名(-n), 减1, for 结束会加1
+                    i += count - 1;
                 }
             }
         }
@@ -226,10 +227,9 @@ const useCommand = (): UseCommandHook => {
             for (let i = 0; i < options.length; i++) {
                 const item = options[i];
                 const getValue = paramsObj[item.alias];
-                // console.log(item)
                 // console.log(!getValue, item.defaultValue)
                 // option存在默认值, 输入option值为true或没有输入option值, 赋默认值
-                if (item.defaultValue !== undefined && ((getValue && typeof getValue === 'boolean') || !getValue)) {
+                if (item.defaultValue !== undefined && ((getValue && typeof getValue === 'boolean') && !getValue)) {
                     paramsObj[item.alias] = item.defaultValue;
                     paramsObj[item.key] = item.defaultValue;
                 }
@@ -237,7 +237,6 @@ const useCommand = (): UseCommandHook => {
                 // 当存在输入值约束时, 进行判断参数是否合理
                 if (item.legalValue && paramsObj[item.alias]) {
                     if (!Object.keys(item.legalValue).includes(paramsObj[item.alias].toString())) {
-                        
                         pushCommands('option参数错误', true);
                         return;
                     }

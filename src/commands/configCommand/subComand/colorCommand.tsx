@@ -21,9 +21,6 @@ const colorCommand: Command = {
         const { _ } = args;
 
         let config = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
-        if (!config) {
-            config = initValLocalStorageConfig();
-        }
         let style = { ...config.style, color: _.join(' ') }
         // console.log( { ...config, style })
 

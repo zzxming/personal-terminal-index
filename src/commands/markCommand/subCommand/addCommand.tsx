@@ -31,12 +31,6 @@ const addMark: Command = {
         // console.log(paramVal)
 
         let preMark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
-        if (!preMark) {
-            preMark = {
-                show: true,
-                data: []
-            };
-        } 
         if (preMark.data.find(mark => mark.key === paramVal.name)) {
             return `书签 ${paramVal.name} 已存在`;
         }

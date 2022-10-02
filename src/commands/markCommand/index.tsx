@@ -1,6 +1,6 @@
 import { Avatar, Card } from "antd";
 import { GlobalOutlined } from '@ant-design/icons';
-import { LOCALSTORAGEMARK } from "../../assets/js/const";
+import { LOCALSTORAGECONFIG, LOCALSTORAGEMARK } from "../../assets/js/const";
 import { CommandResultListOutput } from "../../components/commandListOutput";
 import { Command, Mark, MarkData } from "../../interface/interface";
 import { localStorageSetItem, localStorageGetItem } from "../../utils/localStorage";
@@ -9,10 +9,6 @@ import { delMark } from "./subCommand/delCommand";
 import css from './index.module.css'
 import { modifyMark } from "./subCommand/modifyCommand";
 
-const markShowOption = {
-    'on': '开启',
-    'off': '关闭'
-}
 
 const markCommand: Command= {
     name: 'mark',
@@ -30,7 +26,10 @@ const markCommand: Command= {
             alias: 's',
             desc: '始终显示书签',
             valueNeeded: true,
-            legalValue: markShowOption
+            legalValue: {
+                'on': '开启',
+                'off': '关闭'
+            }
         }, {
             key: 'list',
             alias: 'l',
@@ -48,16 +47,16 @@ const markCommand: Command= {
 
         const { _, show, list } = args;
         if (show) {
-            localStorageSetItem(LOCALSTORAGEMARK, {...localStorageGetItem(LOCALSTORAGEMARK), show: show === 'on' ? true : false})
+            localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), mark: show === 'on' ? true : false })
             return '配置成功'
         }
         if (list) {
-            let data = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+            let { data } = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
             
             return (
                 <CommandResultListOutput<Mark> 
                     key={`mark result ${new Date().getTime()}`}
-                    data={data.data} 
+                    data={data} 
                     render={(item, index) => (
                         <li className={css.mark_list_item}>
                             <Card 
@@ -110,8 +109,15 @@ const markCommand: Command= {
     return link
 }
 
+const initValLocalStorageMark = (): MarkData => {
+    return {
+        data: []
+    }
+}
+
 export {
     markCommand,
-    getURLDomain
+    getURLDomain,
+    initValLocalStorageMark
 }
 

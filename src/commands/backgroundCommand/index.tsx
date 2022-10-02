@@ -1,7 +1,7 @@
 import { getBackgroundImageUrl, ImageType } from "../../assets/js/api"
-import { LOCALSTORAGEBGURL } from "../../assets/js/const";
-import { Command } from "../../interface/interface";
-import { localStorageSetItem } from "../../utils/localStorage";
+import { LOCALSTORAGEBGURL, LOCALSTORAGECONFIG } from "../../assets/js/const";
+import { Command, ConfigData } from "../../interface/interface";
+import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 
 const backgroundCommand: Command = {
     name: 'bg',
@@ -34,7 +34,7 @@ const backgroundCommand: Command = {
 
         if (_.length > 0) {
             // 输入了param,作为图片路径
-            localStorageSetItem(LOCALSTORAGEBGURL, _[0]);
+            localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), bgurl: _[0]});
             return '更换成功';
         }
 
@@ -46,7 +46,7 @@ const backgroundCommand: Command = {
         if (result.data.code !== 0) {
             return '网络错误';
         }
-        localStorageSetItem(LOCALSTORAGEBGURL, result.data.data);
+        localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), bgurl: result.data.data});
         return '更换成功';
     }
 }

@@ -30,15 +30,14 @@ const modifyMark: Command = {
     ],
     subCommands: [],
     action(args, commandHandle) {
-        // console.log(args)
+        console.log(args)
 
         const { _ } = args;
         const name = args.name?.toString();
         const url = args.url?.toString();
 
         const namekey = _.join(' ');
-        const markData = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
-        const marks = markData.data;
+        const { data: marks } = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
         // console.log(marks)
         let markIndex = marks.findIndex(mark => mark.key === namekey)
         if (markIndex === -1) {
@@ -61,13 +60,13 @@ const modifyMark: Command = {
 
         marks.splice(markIndex, 1, {
             ...originMark,
-            key: name,
-            title: name,
+            key: name ?? namekey,
+            title: name ?? namekey,
             url: markUrl,
             icon: iconUrl
         });
 
-        localStorageSetItem(LOCALSTORAGEMARK, {...markData, data: [...marks]});
+        localStorageSetItem(LOCALSTORAGEMARK, { data: [...marks] });
 
         return '修改成功'
     }
