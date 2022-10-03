@@ -39,6 +39,7 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
         pagesize: 0,
         page: 0
     });   // numPages一页数据量, numResults总数据量, pagesize返回数据量
+    const [tip, setTip] = useState('');
     const [pageNum, setPageNum] = useState(1);
     const [pageSize, setPageSize] = useState(24);
     const [searchType, setSearchType] = useState(typeStr);
@@ -53,10 +54,12 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
         if (err) {
             // console.log(err)
             setLoading(false);
+            setTip(err.response?.statusText || err.message);
             return err.response?.statusText || err.message;
         }
         if (result.data.code !== 0) {
             setLoading(false);
+            setTip(result.data.message || '网络错误');
             return result.data.message;
         }
         // console.log(result)
@@ -66,6 +69,9 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
         }
         else {
             setData(datalist);
+            if (datalist.length < 1) {
+                setTip('无搜索结果');
+            }
         }
         setLoading(false);
         setPageNum(page);
@@ -124,7 +130,7 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
                     }) :
                     loading ? 
                         '' : 
-                        <p style={{margin: '0', marginRight: 'auto'}}>无搜索结果</p> 
+                        <p style={{margin: '0', marginRight: 'auto'}}>{tip}</p> 
             }
             {
                 data.length > 0 && !loading ? 

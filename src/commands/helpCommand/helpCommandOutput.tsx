@@ -6,7 +6,10 @@ import { Command, CommandOption, objectValueType } from '../../interface/interfa
 
 interface LegalValueTable {
     key: string
-    value: any
+    key1: string
+    value1: string
+    key2: string
+    value2: string
 }
 
 const commandList = () => (
@@ -33,21 +36,41 @@ const commandDetail = (command: Command) => {
     
     const { name, desc, params, options, subCommands } = command;
 
-    // 考虑一行展示两个参数, 即 '参数 描述 参数 描述'
     const legalTable = (legalValue: objectValueType<CommandOption, 'legalValue'>) => {
         if (!legalValue) return ('');
         const columns: TableColumnsType<LegalValueTable> = [
-            { title: '参数', dataIndex: 'key' },
-            { title: '描述', dataIndex: 'value' },
+            { title: '参数', dataIndex: 'key1' },
+            { title: '描述', dataIndex: 'value1' },
+            { title: '参数', dataIndex: 'key2' },
+            { title: '描述', dataIndex: 'value2' },
         ];
         const dataSource: LegalValueTable[] = []
 
-        for (let item in legalValue) {
+        // 让选项一行显示两条数据
+        let keys = Object.keys(legalValue);
+        for (let i = 0; i < keys.length; i += 2) {
+            let key1 = keys[i];
+            let value1 = legalValue[key1];
+            let key2 = '';
+            let value2 = '';
+            if (i + 1 < keys.length) {
+                key2 = keys[i + 1];
+                value2 = legalValue[key2];
+            }
             dataSource.push({
-                key: item,
-                value: legalValue[item]
-            });
+                key: key1 + key2,
+                key1,
+                value1,
+                key2,
+                value2,
+            })
         }
+        // for (let item in legalValue) {
+        //     dataSource.push({
+        //         key: item,
+        //         value: legalValue[item]
+        //     });
+        // }
         // console.log(dataSource)
         // console.log(columns)
         return (<Table pagination={false} dataSource={dataSource} columns={columns} scroll={{ y: 240 }} style={{overflowY: 'auto'}} />)
@@ -63,7 +86,9 @@ const commandDetail = (command: Command) => {
                             <ul className={css.command_detail}>
                                 {
                                     params.map(param => (
-                                        <li key={param.key}>{param.key} {param.required ? '必填' : '可选'} {param.desc}</li>
+                                        <li key={param.key}>{param.key} {param.required ? '必填' : '可选'} {param.desc}
+                                            {legalTable(param.legalValue)}
+                                        </li>
                                     ))
                                 }
                             </ul>

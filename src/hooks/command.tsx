@@ -227,9 +227,9 @@ const useCommand = (): UseCommandHook => {
             for (let i = 0; i < options.length; i++) {
                 const item = options[i];
                 const getValue = paramsObj[item.alias];
-                // console.log(!getValue, item.defaultValue)
+                // console.log(item, item.defaultValue, getValue)
                 // option存在默认值, 输入option值为true或没有输入option值, 赋默认值
-                if (item.defaultValue !== undefined && ((getValue && typeof getValue === 'boolean') && !getValue)) {
+                if (item.defaultValue !== undefined && !getValue) {
                     paramsObj[item.alias] = item.defaultValue;
                     paramsObj[item.key] = item.defaultValue;
                 }

@@ -37,7 +37,7 @@ const backgroundCommand: Command = {
             localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), bgurl: _[0]});
             return '更换成功';
         }
-
+        commandHandle.pushCommands('等待加载...', true);
         const [err, result] = await getBackgroundImageUrl(type as ImageType);
         if (err) {
             // console.log(err)

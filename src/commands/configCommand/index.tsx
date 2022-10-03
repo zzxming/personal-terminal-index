@@ -55,6 +55,7 @@ const configCommand: Command = {
                         render={(item, index) => {
                             let { key, value } = item;
                             let valueDom: typeof value | React.ReactElement;
+                            // style是以对象存储的
                             if (typeof value === 'object') {
                                 let data = Object.keys(value).map(key => ({
                                     key,

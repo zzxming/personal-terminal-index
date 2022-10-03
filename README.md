@@ -13,12 +13,14 @@
 
     1. cd personal-terminal
     2. cd server
-    3. npm run start
+    3. npm install
+    4. npm run start
 
 - 前端启动
 
     1. cd personal-terminal
-    2. npm run start
+    2. npm install
+    3. npm run start
 
 ```
 
