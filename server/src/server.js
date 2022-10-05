@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const http = require('http');
+const path = require('path');
 
 // 请求大小限制
 const requestLimit = "5120kb";
@@ -14,6 +15,7 @@ class Server {
         this.app.use(morgan('short'));
         this.app.use(bodyParser.urlencoded({ extended: false, limit: requestLimit }));
         this.app.use(bodyParser.json({ limit: requestLimit }));
+        this.app.use(express.static(path.resolve(__dirname, '../')));
         this.server = http.createServer(this.app);
     }
 

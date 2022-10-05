@@ -18,7 +18,11 @@
 .mark_nav_item:hover {
     background-color: #eee;
 }
-:global(.ant-avatar).mark_icon {
+:global(.ant-avatar.ant-avatar-icon).mark_icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
     margin-right: 6px;
 }
 .mark_nav_item .mark_link {

@@ -62,10 +62,10 @@ const markCommand: Command= {
                             <Card 
                                 type="inner" 
                                 title={
-                                    <span>
+                                    <>
                                         <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
                                         {item.title}
-                                    </span>
+                                    </>
                                 }
                             >
                                 <span className={css.mark_list_item_title} title={item.url}>{item.url}</span>
