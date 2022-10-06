@@ -1,5 +1,5 @@
 import { biliSearchResultList } from "./biliSearchListOutput";
-import { Command } from '../../interface/interface';
+import { Command, CommandOutputStatus } from '../../interface/interface';
 
 const result_type = [
     'tips', 
@@ -39,16 +39,22 @@ const biliCommand: Command = {
         }
     ],
     subCommands: [],
-    async action(args, commandHandle) {
+    action(args, commandHandle) {
         // console.log(args)
         const { _, type } = args;
         if (!result_type.includes(type as string)) {
-            return 'option type error'
+            return {
+                constructor: 'option type error',
+                status: CommandOutputStatus.error
+            }
         }
 
         const keywords = _.join(' ');
 
-        return biliSearchResultList(keywords, type as string, commandHandle);
+        return {
+            constructor: biliSearchResultList(keywords, type as string, commandHandle),
+            status: CommandOutputStatus.success
+        }
     }
 }
 

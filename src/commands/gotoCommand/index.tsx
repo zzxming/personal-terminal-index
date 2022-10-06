@@ -1,5 +1,5 @@
 import { LOCALSTORAGEMARK } from "../../assets/js/const";
-import { Command, MarkData, openType } from "../../interface/interface"
+import { Command, CommandOutputStatus, MarkData, openType } from "../../interface/interface"
 import { localStorageGetItem } from "../../utils/localStorage";
 import { toNewPage } from "../../utils/toNewPage";
 
@@ -34,11 +34,17 @@ const gotoCommand: Command = {
 
         if (findMark) {
             toNewPage(findMark.url, self ? openType.self : undefined);
-            return '打开成功'
+            return {
+                constructor: '打开成功',
+                status: CommandOutputStatus.success
+            }
         }
 
         toNewPage(`https://${keyword}`, self ? openType.self : undefined);
-        return '打开成功';
+        return {
+            constructor: '打开成功',
+            status: CommandOutputStatus.success
+        }
     }
 
 }

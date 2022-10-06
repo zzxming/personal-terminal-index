@@ -1,13 +1,10 @@
-import { Avatar, Card } from "antd";
-import { GlobalOutlined } from '@ant-design/icons';
-import { LOCALSTORAGECONFIG, LOCALSTORAGEMARK } from "../../assets/js/const";
-import { CommandResultListOutput } from "../../components/commandListOutput";
-import { Command, Mark, MarkData } from "../../interface/interface";
+import { LOCALSTORAGECONFIG } from "../../assets/js/const";
+import { Command, CommandOutputStatus, MarkData } from "../../interface/interface";
 import { localStorageSetItem, localStorageGetItem } from "../../utils/localStorage";
 import { addMark } from "./subCommand/addCommand";
 import { delMark } from "./subCommand/delCommand";
-import css from './index.module.css'
 import { modifyMark } from "./subCommand/modifyCommand";
+import { MarkList } from "./markCommandOutput";
 
 
 const markCommand: Command= {
@@ -48,35 +45,22 @@ const markCommand: Command= {
         const { _, show, list } = args;
         if (show) {
             localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), mark: show === 'on' ? true : false })
-            return '配置成功'
+            return {
+                constructor: '配置成功',
+                status: CommandOutputStatus.success
+            }
         }
         if (list) {
-            let { data } = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
-            
-            return (
-                <CommandResultListOutput<Mark> 
-                    key={`mark result ${new Date().getTime()}`}
-                    data={data} 
-                    render={(item, index) => (
-                        <li className={css.mark_list_item}>
-                            <Card 
-                                type="inner" 
-                                title={
-                                    <>
-                                        <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
-                                        {item.title}
-                                    </>
-                                }
-                            >
-                                <span className={css.mark_list_item_title} title={item.url}>{item.url}</span>
-                            </Card>
-                        </li>
-                    )} 
-                />
-            )
+            return {
+                constructor: <MarkList key={`mark result ${new Date().getTime()}`} />,
+                status: CommandOutputStatus.success
+            }
         }
 
-        return '命令语法不正确'
+        return {
+            constructor: '命令语法不正确',
+            status: CommandOutputStatus.error
+        }
     }
 }
 

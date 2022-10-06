@@ -1,6 +1,5 @@
 import { CommandResultListOutput } from '../../components/commandListOutput';
-import { HistoryCommand } from '../../hooks/command';
-import { Command } from '../../interface/interface';
+import { Command, CommandOutputStatus, HistoryCommand } from '../../interface/interface';
 
 const historyCommand: Command = {
     name: 'history',
@@ -19,7 +18,10 @@ const historyCommand: Command = {
         const { _ } = args;
         const num = Number(_.join(' '));
         if (isNaN(num) || num < 0) {
-            return '请输入合法数字参数';
+            return {
+                constructor: '请输入合法数字参数',
+                status: CommandOutputStatus.error
+            }
         }
         const { historyCommands } = commandHandle;
         const sortHistoryCommands = [...historyCommands].reverse();
@@ -28,17 +30,20 @@ const historyCommand: Command = {
 
         // console.log(sortHistoryCommands)
 
-        return (
-            <CommandResultListOutput<HistoryCommand> 
-                key={`history result ${new Date().getTime()}`}
-                data={showHistoryCommands} 
-                render={(item, index) => (
-                    <li>
-                        {index + 1} {item.txt}
-                    </li>
-                )} 
-            />
-        )
+        return {
+            constructor: (
+                <CommandResultListOutput<HistoryCommand> 
+                    key={`history result ${new Date().getTime()}`}
+                    data={showHistoryCommands} 
+                    render={(item, index) => (
+                        <li>
+                            {index + 1} {item.txt}
+                        </li>
+                    )} 
+                />
+            ),
+            status: CommandOutputStatus.success
+        }
     }
 }
 

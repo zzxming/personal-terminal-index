@@ -4,7 +4,7 @@ import {
     AxiosResult,
     MusicResult,
 } from '../../assets/js/api'
-import { Command } from '../../interface/interface';
+import { Command, CommandOutputStatus } from '../../interface/interface';
 import { AxiosError } from 'axios';
 
 
@@ -61,34 +61,46 @@ const musicCommand: Command = {
             const [err, result] = await getTypeOption.func(keywords);
             if (err) {
                 // console.log(err)
-                return err.response?.statusText || err.message
+                return {
+                    constructor: err.response?.statusText || err.message,
+                    status: CommandOutputStatus.error
+                }
             }
             if (result) {
                 if (result.data.code !== 0) {
                     // console.log(result)
-                    return '网络错误'
+                    return {
+                        constructor: '网络错误',
+                        status: CommandOutputStatus.error
+                    }
                 }
                 // console.log(result)
                 const songs = result.data.data;
                 if (songs.length < 1) {
-                    return 'Not Found';
+                    return {
+                        constructor: 'Not Found',
+                        status: CommandOutputStatus.error
+                    }
                 }
                 urlid = songs[0].id;
             }
         }
 
         let url = `https://music.163.com/outchain/player?type=${type}&id=${urlid}&auto=1&height=${getTypeOption.height - 20}`;
-        return (
-            <div key={`music result ${url}`}>
-                <iframe 
-                    frameBorder="no" marginWidth={0} marginHeight={0} width="330" 
-                    height={getTypeOption.height} 
-                    src={url}
-                    title={`${keywords}`}
-                >
-                </iframe>
-            </div>
-        )
+        return {
+            constructor: (
+                <div key={`music result ${url}`}>
+                    <iframe 
+                        frameBorder="no" marginWidth={0} marginHeight={0} width="330" 
+                        height={getTypeOption.height} 
+                        src={url}
+                        title={`${keywords}`}
+                    >
+                    </iframe>
+                </div>
+            ),
+            status: CommandOutputStatus.success
+        }
     }
 }
 

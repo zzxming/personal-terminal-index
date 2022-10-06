@@ -1,5 +1,5 @@
 
-import { Command } from "../../interface/interface";
+import { Command, CommandOutputStatus } from "../../interface/interface";
 import { GetLogTable } from "./logCommandOutput";
 
 
@@ -14,7 +14,10 @@ const logCommand: Command = {
     action(args, commandHandle) {
         // console.log(args);
         
-        return <GetLogTable key={`log result ${new Date().getTime()}`} />
+        return {
+            constructor: <GetLogTable key={`log result ${new Date().getTime()}`} />,
+            status: CommandOutputStatus.success
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 import { LOCALSTORAGEMARK } from "../../../assets/js/const";
-import { Command, MarkData } from "../../../interface/interface";
+import { Command, CommandOutputStatus, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
 const delMark: Command = {
@@ -32,7 +32,10 @@ const delMark: Command = {
             localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data })
         }
         
-        return '删除成功'
+        return {
+            constructor: '删除成功',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

@@ -1,13 +1,13 @@
-import { useRef, useLayoutEffect, useState, useEffect, ChangeEvent, StyleHTMLAttributes } from "react";
+import { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { throttle } from 'lodash'
 import useBackgroundImage from "../../hooks/backgroundImage";
 import useCommand from "../../hooks/command";
-import css from './index.module.css'
-import { throttle } from 'lodash'
 import { MarkNav } from "../../commands/markCommand/markCommandOutput";
-import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
-import { localStorageGetItem } from "../../utils/localStorage";
-import { ConfigData, MarkData } from "../../interface/interface";
 import { TimeCount } from "../../commands/timeCommand/timeCommandOutput";
+import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP } from "../../assets/js/const";
+import { localStorageGetItem } from "../../utils/localStorage";
+import { CommandOutputStatus, ConfigData } from "../../interface/interface";
+import css from './index.module.css'
 
 const Terminal: React.FC = () => {
 
@@ -162,7 +162,15 @@ const Terminal: React.FC = () => {
                                     {
                                         item.isResult ? '' : <span className={css.terminal_user}>[local]:</span>
                                     }
-                                    { item.construct }
+                                    { 
+                                        item.isResult ? 
+                                            item.status === CommandOutputStatus.success ?
+                                                '' : 
+                                                    <span className={`${css.command_result_status} ${item.status === CommandOutputStatus.error ? css.error : css.warn}`}>
+                                                        {item.status}
+                                                    </span>: 
+                                                    ''
+                                    } { item.construct }
                                 </div>
                             ))
                         }

@@ -1,5 +1,5 @@
 import { searchCommand } from "..";
-import { Command } from "../../interface/interface";
+import { Command, CommandOutputStatus } from "../../interface/interface";
 import { commandDetail, commandList } from "./helpCommandOutput";
 
 
@@ -21,11 +21,22 @@ const helpCommand: Command = {
 
         if (_.length < 1) {
             // 没有param参数, 直接输出command list
-            return commandList()
+            return {
+                constructor: commandList(),
+                status: CommandOutputStatus.success
+            }
         } else {
             let getCommand = searchCommand(_.join(' '));
-            if (!getCommand) return '没找到命令'
-            return commandDetail(getCommand);
+            if (!getCommand) {
+                return {
+                    constructor: '没找到命令',
+                    status: CommandOutputStatus.error
+                }
+            }
+            return {
+                constructor: commandDetail(getCommand),
+                status: CommandOutputStatus.success
+            }
         }
     }
 }

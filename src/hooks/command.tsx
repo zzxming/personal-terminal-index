@@ -1,37 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { commandUseFunc, searchCommand } from '../commands/index'
 import { commandMap } from '../commands/registerCommand'
-import style from '../assets/css/command.module.css'
-import { CommandOption } from "../interface/interface";
+import { CommandActionOutput, CommandOption, CommandOutput, CommandOutputStatus, CommandParamArgs, HistoryCommand } from "../interface/interface";
+import css from '../pages/terminal/index.module.css'
 
-interface Command {
-    key: string
-    construct: React.ReactElement
-    isResult: boolean
-}
-export interface HistoryCommand {
-    txt: string
-}
-export interface CommandParamArgs {
-    [x: string]: string | boolean | number | string[],
-    _: string[]
-}
+
 // setCommandHint 和 completionCommand 两个函数中的 commands 类型使用 Command[] 有问题, 导致 commandMap 没法传入, 使用 typeof 获取类型
 export interface UseCommandHook {
-    commands: Command[]
+    commands: CommandOutput[]
     historyCommands: HistoryCommand[]
     historyCommandsIndex: number
     clearCommand: () => void
     setHistoryCommandsIndex: React.Dispatch<React.SetStateAction<number>>
     excuteCommand: (command: string, commandHandle: UseCommandHook) => void
     setCommandHint: (str: string, isCompletion?: boolean, commands?: typeof commandMap) => string
-    pushCommands: (command: React.ReactElement | string, isResult: boolean) => void
+    pushCommands: (command: CommandActionOutput, isResult: boolean) => void
 }
-
 
 const useCommand = (): UseCommandHook => {
     // commands内存jsx或者文本命令,history内存string(命令原文本)
-    const [commands, setCommands] = useState<Command[]>([]);
+    const [commands, setCommands] = useState<CommandOutput[]>([]);
     // 历史命令
     const [historyCommands, setHistoryCommands] = useState<HistoryCommand[]>([]);
     // 当前显示历史命令下标
@@ -43,43 +31,46 @@ const useCommand = (): UseCommandHook => {
         setHistoryCommandsIndex(historyCommands.length);
     }, [historyCommands]);
 
-    const pushCommands = (command: React.ReactElement | string, isResult: boolean) => {
+    const pushCommands = (command: CommandActionOutput, isResult: boolean) => {
         // 空命令直接输出
-        if (command === '') {
+        let { constructor, status } = command;
+        if (constructor === '') {
             setCommands(commands => {
                 // console.log(commands)
                 return [...commands, {
-                    construct: <div className={style.command_txt}></div>,
+                    construct: <div className={css.command_txt}></div>,
                     key: `empty ${new Date().getTime()}`, 
-                    isResult
+                    isResult,
+                    status: CommandOutputStatus.success
                 }]
             });
             return;
         }
         // 当命令不是字符串时,元素需要key值不正确
-        if (typeof command !== 'string' && !command.key) {
+        if (typeof constructor !== 'string' && !constructor.key) {
             // console.log(command)
             throw new Error('参数错误, 元素key值不存在');
         }
         
         let key: string;
-        if (typeof command === 'string') {
-            key = `input ${command} ${new Date().getTime()}`;
+        if (typeof constructor === 'string') {
+            key = `input ${constructor} ${new Date().getTime()}`;
         }
         else {
-            key = command.key?.toString() ?? new Date().getTime().toString();
+            key = constructor.key?.toString() ?? new Date().getTime().toString();
         }
-        // console.log(command)
 
-        let className = style.command_iframe;
-        if (typeof command === 'string') {
-            className = style.command_txt;
+        let className = css.command_iframe;
+        if (typeof constructor === 'string') {
+            className = css.command_txt;
         }
         // console.log(typeof command)
         setCommands(commands => {
             return [...commands, {
-                construct: <div className={className}>{command}</div>,
-                key, isResult
+                construct: <div className={className}>{constructor}</div>,
+                key, 
+                isResult, 
+                status: status || CommandOutputStatus.success
             }]
         });
     }
@@ -161,16 +152,16 @@ const useCommand = (): UseCommandHook => {
     const excuteCommand = async (command: string, commandHandle: UseCommandHook) => {
         console.log('excute', command)
         if (command.trim() === '') {
-            pushCommands(command, false);
+            pushCommands({constructor: command}, false);
             return;
         }
 
         const commandFragment = command.split(' ');
         const resultCommand = searchCommand(commandFragment[0]);
         
-        pushCommands(command, false);
+        pushCommands({constructor: command}, false);
         pushHistoryCommands(command);
-        let result: string | React.ReactElement;
+        let result: CommandActionOutput;
         if (resultCommand) {
             // 子命令检测
             let actionCommand = resultCommand;      // 最终执行命令
@@ -208,7 +199,10 @@ const useCommand = (): UseCommandHook => {
             // console.log(paramsCount)
             if (paramsObj._.length < paramsCount) {
                 // param参数必须,但未输入
-                pushCommands('param参数缺少', true);
+                pushCommands({
+                    constructor: 'param参数缺少',
+                    status: CommandOutputStatus.error
+                }, true);
                 return;
             }
             // params合法值判断
@@ -218,7 +212,10 @@ const useCommand = (): UseCommandHook => {
                 if (legalValue) {
                     let legalValues = Object.keys(legalValue);
                     if (!legalValues.includes(item)) {
-                        pushCommands(`param ${actionCommand.params[i].key} 参数错误`, true);
+                        pushCommands({
+                            constructor: `param ${actionCommand.params[i].key} 参数错误`,
+                            status: CommandOutputStatus.error
+                        }, true, );
                         return;
                     }
                 }
@@ -237,17 +234,28 @@ const useCommand = (): UseCommandHook => {
                 // 当存在输入值约束时, 进行判断参数是否合理
                 if (item.legalValue && paramsObj[item.alias]) {
                     if (!Object.keys(item.legalValue).includes(paramsObj[item.alias].toString())) {
-                        pushCommands('option参数错误', true);
+                        pushCommands({
+                            constructor: 'option参数错误',
+                            status: CommandOutputStatus.error
+                        }, true);
                         return;
                     }
                 }
             }
             // 执行
             // console.log(paramsObj)
-            result = await actionCommand.action(paramsObj, commandHandle);
+            let commandReturn = await actionCommand.action(paramsObj, commandHandle);
+            // 无返回值不记录
+            if (!commandReturn) {
+                return;
+            }
+            result = commandReturn;
         } else {
             // 命令不存在
-            result = '命令不存在';
+            result = {
+                constructor: '命令不存在',
+                status: CommandOutputStatus.error
+            };
         }
         pushCommands(result, true);
         // console.log(commands)

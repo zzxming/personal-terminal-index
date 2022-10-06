@@ -6,7 +6,7 @@ import { BiliVideoIframe } from "./biliVideoOutput";
 import style from './index.module.css'
 import ALink from "../../components/noRouteALink";
 import { UseCommandHook } from "../../hooks/command";
-import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo } from "../../interface/interface";
+import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo, CommandOutputStatus } from "../../interface/interface";
 
 const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: UseCommandHook) => {
     // console.log(data)
@@ -180,7 +180,10 @@ const BiliVideoItem: React.FC<BiliVideoItemProps> = (props) => {
     // 打开视频
     const openVideo = () => {
         // console.log(props.commandHandle)
-        props.commandHandle.pushCommands(<BiliVideoIframe key={`video${bvid}`} bv={bvid} />, true);
+        props.commandHandle.pushCommands({
+            constructor: <BiliVideoIframe key={`video${bvid}`} bv={bvid} />,
+            status: CommandOutputStatus.success
+        }, true);
     }
 
     return (

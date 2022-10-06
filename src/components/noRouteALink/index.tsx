@@ -2,8 +2,9 @@
 
 interface IALinkProps {
     href: string
-    children?: React.ReactElement | React.ReactElement[]
+    children?: React.ReactElement | React.ReactElement[] | string
     className?: string
+    style?: React.CSSProperties
     title?: string
 }
 
