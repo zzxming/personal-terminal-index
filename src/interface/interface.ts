@@ -8,7 +8,7 @@ export interface Command {
     params: CommandParam[]
     options: CommandOption[]
     subCommands: Command[]
-    action: (args: CommandParamArgs, commandHandle: UseCommandHook) 
+    action: (args: CommandParamArgs, commandHandle: UseCommandHook, view: HTMLElement) 
         => CommandActionOutput | Promise<CommandActionOutput> | void
 }
 export interface CommandParam {

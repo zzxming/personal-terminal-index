@@ -12,7 +12,7 @@ export interface UseCommandHook {
     historyCommandsIndex: number
     clearCommand: () => void
     setHistoryCommandsIndex: React.Dispatch<React.SetStateAction<number>>
-    excuteCommand: (command: string, commandHandle: UseCommandHook) => void
+    excuteCommand: (command: string, commandHandle: UseCommandHook, view: HTMLElement) => void
     setCommandHint: (str: string, isCompletion?: boolean, commands?: typeof commandMap) => string
     pushCommands: (command: CommandActionOutput, isResult: boolean) => void
 }
@@ -149,7 +149,7 @@ const useCommand = (): UseCommandHook => {
      * @param command 命令字符串
      * @param commandHandle command hook
      */
-    const excuteCommand = async (command: string, commandHandle: UseCommandHook) => {
+    const excuteCommand = async (command: string, commandHandle: UseCommandHook, view: HTMLElement) => {
         console.log('excute', command)
         if (command.trim() === '') {
             pushCommands({constructor: command}, false);
@@ -244,7 +244,7 @@ const useCommand = (): UseCommandHook => {
             }
             // 执行
             // console.log(paramsObj)
-            let commandReturn = await actionCommand.action(paramsObj, commandHandle);
+            let commandReturn = await actionCommand.action(paramsObj, commandHandle, view);
             // 无返回值不记录
             if (!commandReturn) {
                 return;

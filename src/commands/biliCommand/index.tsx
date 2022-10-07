@@ -39,7 +39,7 @@ const biliCommand: Command = {
         }
     ],
     subCommands: [],
-    action(args, commandHandle) {
+    action(args, commandHandle, view) {
         // console.log(args)
         const { _, type } = args;
         if (!result_type.includes(type as string)) {
@@ -52,7 +52,7 @@ const biliCommand: Command = {
         const keywords = _.join(' ');
 
         return {
-            constructor: biliSearchResultList(keywords, type as string, commandHandle),
+            constructor: biliSearchResultList(keywords, type as string, commandHandle, view),
             status: CommandOutputStatus.success
         }
     }

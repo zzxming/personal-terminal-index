@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { createRef, Fragment, useCallback, useEffect, useState } from "react";
 import { getBiliPic, getBiliSearchTypeResult } from "../../assets/js/api";
 import { Pagination, PaginationProps } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
@@ -8,17 +8,24 @@ import ALink from "../../components/noRouteALink";
 import { UseCommandHook } from "../../hooks/command";
 import { BiliTypeVideo, BiliVideo, BiliVideoSearchInfo, CommandOutputStatus } from "../../interface/interface";
 
-const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: UseCommandHook) => {
+const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: UseCommandHook, view: HTMLElement) => {
     // console.log(data)
     // 根据 typeStr 进行组件筛选, 显示不同的搜索结果
 
-    return <BiliVideoList key={`bili search result ${typeStr} ${new Date().getTime()}`} typeStr={typeStr} keywords={keywords} commandHandle={commandHandle} />
+    return <BiliVideoList 
+        key={`bili search result ${typeStr} ${new Date().getTime()}`} 
+        typeStr={typeStr} 
+        keywords={keywords} 
+        commandHandle={commandHandle}
+        view={view}
+    />
 }
 // 搜索视频列表
 interface BiliVideoListProps {
     keywords: string
     commandHandle: UseCommandHook
     typeStr: string
+    view: HTMLElement
 }
 // bilibili 的搜索结果根据屏幕显示改变
 const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
@@ -29,8 +36,9 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
      * 一行6个时,显示28页
      * 一行7个时,显示24页
      */
-    const { keywords, commandHandle, typeStr } = props;
-
+    const { keywords, commandHandle, typeStr, view } = props;
+    
+    const videoList = createRef<HTMLDivElement>();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<BiliTypeVideo[]>([]);
     const [dataInfo, setDataInfo] = useState<BiliVideoSearchInfo>({
@@ -83,15 +91,17 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
     }, [getVideoSearchResult, pageNum])
 
     // 翻页
-    const pageChange: PaginationProps['onChange'] = (page) => {
+    const pageChange: PaginationProps['onChange'] = async (page) => {
         // console.log(page)
         setPageNum(page);
-        // getSearchResult(page)
-        getVideoSearchResult(page)
+        // 点击下一页加载完成后自动回到顶部
+        let offsetTop = videoList.current?.offsetTop ?? 0;
+        await getVideoSearchResult(page)
+        view.scrollTop = offsetTop - 60;
     }
 
     return (
-        <div className={style.video_list}>
+        <div className={style.video_list} ref={videoList}>
             {
                 loading ? <div style={{
                     position: 'absolute',
@@ -133,7 +143,7 @@ const BiliVideoList: React.FC<BiliVideoListProps> = (props) => {
                         <p style={{margin: '0', marginRight: 'auto'}}>{tip}</p> 
             }
             {
-                data.length > 0 && !loading ? 
+                data.length > 0 ? 
                     <Pagination pageSize={pageSize} showSizeChanger={false} current={pageNum} onChange={pageChange} total={dataInfo.numResults} /> 
                     : ''
             }

@@ -17,6 +17,9 @@
   background: #ccc;
   border-radius: 4px;
 }
+::-webkit-scrollbar-track {
+
+}
 ::-webkit-scrollbar-button {
   display: none;
 }
