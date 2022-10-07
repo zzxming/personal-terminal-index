@@ -1,6 +1,6 @@
 import { initValLocalStorageConfig } from "..";
 import { LOCALSTORAGECONFIG } from "../../../assets/js/const";
-import { Command, ConfigData } from "../../../interface/interface";
+import { Command, CommandOutputStatus } from "../../../interface/interface";
 import { localStorageSetItem } from "../../../utils/localStorage";
 
 
@@ -14,7 +14,10 @@ const clearCommand: Command = {
         // console.log(args)
 
         localStorageSetItem(LOCALSTORAGECONFIG, initValLocalStorageConfig());
-        return '配置项已重置'
+        return {
+            constructor: '配置项已重置',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

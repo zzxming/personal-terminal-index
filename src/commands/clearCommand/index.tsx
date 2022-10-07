@@ -10,7 +10,6 @@ const clearCommand: Command = {
     action(args, commandHandle) {
         // console.log(commandHandle.commands)
         commandHandle.clearCommand();
-        return '';
     }
 }
 

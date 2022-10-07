@@ -1,11 +1,8 @@
-import { LOCALSTORAGECONFIG } from "../../assets/js/const";
-import { CommandResultListOutput } from "../../components/commandListOutput";
-import { Command, ConfigData, openType } from "../../interface/interface";
-import { localStorageGetItem } from "../../utils/localStorage";
+import { Command, CommandOutputStatus, ConfigData, openType } from "../../interface/interface";
 import { clearCommand } from "./subComand/clearCommand";
 import { colorCommand } from "./subComand/colorCommand";
 import { openCommand } from "./subComand/openCommand";
-import css from './index.module.css'
+import { ConfigListOutput } from "./configCommandOutput";
 
 const configCommand: Command = {
     name: 'config',
@@ -35,57 +32,15 @@ const configCommand: Command = {
         const { list } = args;
 
         if (list) {
-            let config = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
-            if (!config) {
-                return ''
+            return {
+                constructor: <ConfigListOutput key={`config list result ${new Date().getTime()}`} />,
+                status: CommandOutputStatus.success
             }
-            let configList = (Object.keys(config) as (keyof ConfigData)[]).map(key => {
-                return {
-                    key,
-                    value: config[key]
-                }
-            })
-            // console.log(configList)
-            return (
-                <div
-                    key={`config list result ${new Date().getTime()}`}
-                >
-                    <CommandResultListOutput<typeof configList[0]> 
-                        data={configList} 
-                        render={(item, index) => {
-                            let { key, value } = item;
-                            let valueDom: typeof value | React.ReactElement;
-                            // style是以对象存储的
-                            if (typeof value === 'object') {
-                                let data = Object.keys(value).map(key => ({
-                                    key,
-                                    value: (value as {[key: string]: string})[key]
-                                }))
-                                valueDom = <CommandResultListOutput<typeof data[0]> 
-                                    data={data} 
-                                    render={(item) => (
-                                        <li>
-                                            <span>{item.key} - {item.value}</span>
-                                        </li>
-                                    )}
-                                />
-                            }
-                            else {
-                                valueDom = value;
-                            }
-                            return (
-                                <li className={css.config_list_item}>
-                                    <span className={`${css.config_list_item_value} ${css.key}`}>{key}</span>
-                                    -
-                                    <span className={`${css.config_list_item_value} ${css.value}`}>{valueDom}</span>
-                                </li>
-                            )
-                        }}
-                    />
-                </div>
-            )
         }
-        return '';
+        return {
+            constructor: '参数错误',
+            status: CommandOutputStatus.error
+        };
     }
 }
 

@@ -1,7 +1,6 @@
-import { Command, ConfigData } from "../../../interface/interface";
+import { Command, CommandOutputStatus, ConfigData } from "../../../interface/interface";
 import { LOCALSTORAGECONFIG } from "../../../assets/js/const";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
-import { initValLocalStorageConfig } from "..";
 
 
 const colorCommand: Command = {
@@ -26,7 +25,10 @@ const colorCommand: Command = {
 
         localStorageSetItem(LOCALSTORAGECONFIG, { ...config, style });
 
-        return '配置成功'
+        return {
+            constructor: '配置成功',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

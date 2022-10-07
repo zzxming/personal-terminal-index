@@ -1,5 +1,5 @@
 import React from "react"
-import { CommandParamArgs, UseCommandHook } from "../hooks/command"
+import { UseCommandHook } from "../hooks/command"
 
 // command 接口 start
 export interface Command {
@@ -8,8 +8,8 @@ export interface Command {
     params: CommandParam[]
     options: CommandOption[]
     subCommands: Command[]
-    action: ((args: CommandParamArgs, commandHandle: UseCommandHook) => string | React.ReactElement) | 
-            ((args: CommandParamArgs, commandHandle: UseCommandHook) => Promise<string | React.ReactElement>)
+    action: (args: CommandParamArgs, commandHandle: UseCommandHook) 
+        => CommandActionOutput | Promise<CommandActionOutput> | void
 }
 export interface CommandParam {
     key: string             // key值
@@ -32,6 +32,31 @@ export interface CommandOption {
 // 获取对象中某属性的数据类型
 export type objectValueType<T extends object, K extends keyof T> = T[K];
 // command 接口 end
+
+// command 输出结果接口 start
+export interface CommandActionOutput {
+    constructor: string | React.ReactElement 
+    status?: CommandOutputStatus
+}
+export interface CommandOutput {
+    key: string
+    construct: React.ReactElement
+    isResult: boolean
+    status: CommandOutputStatus
+}
+export enum CommandOutputStatus {
+    success = 'success',
+    error = 'error',
+    warn = 'warn'
+}
+export interface HistoryCommand {
+    txt: string
+}
+export interface CommandParamArgs {
+    [x: string]: string | boolean | number | string[],
+    _: string[]
+}
+// command 输出结果接口 end
 
 
 // bili api 接口 start

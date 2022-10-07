@@ -1,5 +1,5 @@
 import { LOCALSTORAGECONFIG } from "../../assets/js/const";
-import { Command, ConfigData } from "../../interface/interface";
+import { Command, CommandOutputStatus } from "../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 
 const timeCommand: Command = {
@@ -26,14 +26,23 @@ const timeCommand: Command = {
 
         if (show) {
             localStorageSetItem(LOCALSTORAGECONFIG, { ...localStorageGetItem(LOCALSTORAGECONFIG), time: show === 'on' ? true : false });
-            return '配置成功';
+            return {
+                constructor: '配置成功',
+                status: CommandOutputStatus.success
+            }
         }
         if (_.length < 1) {
             let nowDate = new Date();
-            return `${nowDate.toLocaleDateString()} ${nowDate.toLocaleTimeString()}`
+            return {
+                constructor: `${nowDate.toLocaleDateString()} ${nowDate.toLocaleTimeString()}`,
+                status: CommandOutputStatus.success
+            }
         }
 
-        return '参数错误';
+        return {
+            constructor: '参数错误',
+            status: CommandOutputStatus.error
+        }
     }
 }
 

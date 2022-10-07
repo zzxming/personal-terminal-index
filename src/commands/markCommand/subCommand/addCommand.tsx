@@ -1,6 +1,6 @@
 import { getURLDomain } from "..";
 import { LOCALSTORAGEMARK } from "../../../assets/js/const";
-import { Command, MarkData } from "../../../interface/interface";
+import { Command, CommandOutputStatus, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
 const addMark: Command = {
@@ -32,7 +32,10 @@ const addMark: Command = {
 
         let preMark = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
         if (preMark.data.find(mark => mark.key === paramVal.name)) {
-            return `书签 ${paramVal.name} 已存在`;
+            return {
+                constructor: `书签 ${paramVal.name} 已存在`,
+                status: CommandOutputStatus.warn
+            }
         }
         // 获取目标页面的图标
         // console.log(paramVal)
@@ -50,7 +53,10 @@ const addMark: Command = {
         }]
         localStorageSetItem(LOCALSTORAGEMARK, { ...preMark, data })
         
-        return '添加成功'
+        return {
+            constructor: '添加成功',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

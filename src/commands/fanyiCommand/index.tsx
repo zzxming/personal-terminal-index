@@ -1,6 +1,6 @@
 import { fanyiApi, FanyiRejResult, FanyiResResult } from '../../assets/js/api'
-import css from '../../assets/css/command.module.css'
-import { Command } from '../../interface/interface';
+import { Command, CommandOutputStatus } from '../../interface/interface';
+import css from '../../pages/terminal/index.module.css'
 
 const lang: {
     [key: string]: string
@@ -74,32 +74,44 @@ const fanyiCommand: Command = {
         const [err, result] = await fanyiApi({ keywords, to: toArg, from: fromArg });
         if (err) {
             // console.log(err)
-            return err.response?.statusText || err.message
+            return {
+                constructor: err.response?.statusText || err.message,
+                status: CommandOutputStatus.error
+            }
         }
         // console.log(result)
         if (result.data.code !== 0) {
-            console.log(result.data?.message)
-            return '网络错误'
+            // console.log(result.data?.message)
+            return {
+                constructor: '网络错误',
+                status: CommandOutputStatus.error
+            }
         }
 
         const rejData = result.data.data as FanyiRejResult
         if (rejData.error_code) {
             const { error_code, error_message } = rejData;
             // console.log(data.error_msg);
-            return (
-                <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
-                    error code: {error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
-                </div>
-            )
+            return {
+                constructor: (
+                    <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
+                        error code: {error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
+                    </div>
+                ),
+                status: CommandOutputStatus.error
+            }
         }
         else {
             const resData = result.data.data as FanyiResResult;
             const { trans_result, to, from } = resData;
-            return (
-                <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
-                    从{lang[from]}: {trans_result[0].src}，翻译成{lang[to]}: {trans_result[0].dst}
-                </div>
-            );
+            return {
+                constructor: (
+                    <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
+                        从{lang[from]}: {trans_result[0].src}，翻译成{lang[to]}: {trans_result[0].dst}
+                    </div>
+                ),
+                status: CommandOutputStatus.success
+            };
         }
     }
 }

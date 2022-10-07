@@ -1,4 +1,4 @@
-import { Command, openType } from "../../interface/interface"
+import { Command, CommandOutputStatus, openType } from "../../interface/interface"
 import { toNewPage } from "../../utils/toNewPage";
 
 
@@ -30,7 +30,10 @@ const baiduCommand: Command = {
 
         toNewPage(url, self ? openType.self : undefined);
 
-        return '跳转成功';
+        return {
+            constructor: '跳转成功',
+            status: CommandOutputStatus.success
+        };
     }
 }
 

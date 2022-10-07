@@ -1,7 +1,6 @@
-import { Command, ConfigData } from "../../../interface/interface";
+import { Command, CommandOutputStatus, ConfigData } from "../../../interface/interface";
 import { LOCALSTORAGECONFIG } from "../../../assets/js/const";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
-import { initValLocalStorageConfig } from "..";
 
 
 const openCommand: Command = {
@@ -27,7 +26,10 @@ const openCommand: Command = {
         let config = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
         localStorageSetItem(LOCALSTORAGECONFIG, {...config, open: _[0]});
 
-        return '配置成功'
+        return {
+            constructor: '配置成功',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

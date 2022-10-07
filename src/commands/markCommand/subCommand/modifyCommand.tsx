@@ -1,6 +1,6 @@
 import { getURLDomain } from "..";
 import { LOCALSTORAGEMARK } from "../../../assets/js/const";
-import { Command, MarkData } from "../../../interface/interface";
+import { Command, CommandOutputStatus, MarkData } from "../../../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../../../utils/localStorage";
 
 
@@ -41,7 +41,10 @@ const modifyMark: Command = {
         // console.log(marks)
         let markIndex = marks.findIndex(mark => mark.key === namekey)
         if (markIndex === -1) {
-            return '书签不存在'
+            return {
+                constructor: '书签不存在',
+                status: CommandOutputStatus.error
+            }
         }
         // 可以使用命令执行(先删除合并数据后再添加), 但会导致command历史记录污染, 所以还是手动
         let originMark = marks[markIndex];
@@ -68,7 +71,10 @@ const modifyMark: Command = {
 
         localStorageSetItem(LOCALSTORAGEMARK, { data: [...marks] });
 
-        return '修改成功'
+        return {
+            constructor: '修改成功',
+            status: CommandOutputStatus.success
+        }
     }
 }
 

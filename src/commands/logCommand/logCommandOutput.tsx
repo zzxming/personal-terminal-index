@@ -429,7 +429,7 @@ const ExpandableTable = <T extends object & TableData,>(props: TableProps<T>) =>
                     }}
                     title={(pageData) => {
                         // console.log(pageData)
-                        {/* 新增行按钮 */}
+                        // 新增日志按钮
                         return (
                             <div className={css.table_out_header}>
                                 {

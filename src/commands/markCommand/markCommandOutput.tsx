@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Avatar, List } from "antd"
+import { Avatar, Card, List } from "antd"
 import { GlobalOutlined } from '@ant-design/icons';
 import { ConfigData, Mark, MarkData  } from "../../interface/interface"
 import css from './index.module.css'
 import { localStorageGetItem, localStorageSetItem } from "../../utils/localStorage";
 import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP, LOCALSTORAGEMARK } from "../../assets/js/const";
+import { CommandResultListOutput } from "../../components/commandListOutput";
 
 const MarkNav: React.FC = () => {
 
@@ -61,6 +62,32 @@ const MarkNav: React.FC = () => {
     )
 }
 
+const MarkList: React.FC = () => {
+    let { data } = localStorageGetItem(LOCALSTORAGEMARK) as MarkData;
+        
+        return (
+            <CommandResultListOutput<Mark> 
+                data={data} 
+                render={(item, index) => (
+                    <li className={css.mark_list_item}>
+                        <Card 
+                            type="inner" 
+                            title={
+                                <>
+                                    <Avatar className={css.mark_icon} icon={<GlobalOutlined />} src={item.icon} />
+                                    {item.title}
+                                </>
+                            }
+                        >
+                            <span className={css.mark_list_item_title} title={item.url}>{item.url}</span>
+                        </Card>
+                    </li>
+                )} 
+            />
+        )
+}
+
 export {
-    MarkNav
+    MarkNav,
+    MarkList
 }
