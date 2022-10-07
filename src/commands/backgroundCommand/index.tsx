@@ -69,4 +69,3 @@ const backgroundCommand: Command = {
 export {
     backgroundCommand
 }
-
