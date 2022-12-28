@@ -7,7 +7,7 @@
 # 项目启动
 
 ```
-- git clone https://gitee.com/zzxming77/personal-terminal.git
+- git clone https://github.com/zzxming/personal-terminal-index.git
 
 - 后端启动
 
