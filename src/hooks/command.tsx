@@ -39,7 +39,7 @@ const useCommand = (): UseCommandHook => {
                 // console.log(commands)
                 return [...commands, {
                     construct: <div className={css.command_txt}></div>,
-                    key: `empty ${new Date().getTime()}`, 
+                    key: `empty ${crypto.randomUUID()}`, 
                     isResult,
                     status: CommandOutputStatus.success
                 }]
@@ -54,10 +54,10 @@ const useCommand = (): UseCommandHook => {
         
         let key: string;
         if (typeof constructor === 'string') {
-            key = `input ${constructor} ${new Date().getTime()}`;
+            key = `input ${constructor} ${crypto.randomUUID()}`;
         }
         else {
-            key = constructor.key?.toString() ?? new Date().getTime().toString();
+            key = constructor.key?.toString() ?? crypto.randomUUID();
         }
 
         let className = css.command_iframe;

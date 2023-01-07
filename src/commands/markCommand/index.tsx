@@ -52,7 +52,7 @@ const markCommand: Command= {
         }
         if (list) {
             return {
-                constructor: <MarkList key={`mark result ${new Date().getTime()}`} />,
+                constructor: <MarkList key={`mark result ${crypto.randomUUID()}`} />,
                 status: CommandOutputStatus.success
             }
         }

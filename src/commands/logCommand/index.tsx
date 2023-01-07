@@ -15,7 +15,7 @@ const logCommand: Command = {
         // console.log(args);
         
         return {
-            constructor: <GetLogTable key={`log result ${new Date().getTime()}`} />,
+            constructor: <GetLogTable key={`log result ${crypto.randomUUID()}`} />,
             status: CommandOutputStatus.success
         }
     }

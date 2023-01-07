@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { LOCALSTORAGEBGURL, LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP } from "../assets/js/const";
+import { LOCALSTORAGECONFIG, LOCALSTORAGEEVENTMAP } from "../assets/js/const";
 import { ConfigData } from "../interface/interface";
 import { localStorageGetItem, localStorageSetItem } from "../utils/localStorage";
 

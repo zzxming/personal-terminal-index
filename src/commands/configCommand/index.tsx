@@ -33,7 +33,7 @@ const configCommand: Command = {
 
         if (list) {
             return {
-                constructor: <ConfigListOutput key={`config list result ${new Date().getTime()}`} />,
+                constructor: <ConfigListOutput key={`config list result ${crypto.randomUUID()}`} />,
                 status: CommandOutputStatus.success
             }
         }

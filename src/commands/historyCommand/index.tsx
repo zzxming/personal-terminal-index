@@ -33,7 +33,7 @@ const historyCommand: Command = {
         return {
             constructor: (
                 <CommandResultListOutput<HistoryCommand> 
-                    key={`history result ${new Date().getTime()}`}
+                    key={`history result ${crypto.randomUUID()}`}
                     data={showHistoryCommands} 
                     render={(item, index) => (
                         <li>

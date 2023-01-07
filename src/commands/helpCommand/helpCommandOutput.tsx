@@ -13,7 +13,7 @@ interface LegalValueTable {
 }
 
 const commandList = () => (
-    <div className={css.command_list} key={new Date().getTime() + 'help'}>
+    <div className={css.command_list} key={crypto.randomUUID() + 'help'}>
         <p className={css.command_list_desc}>命令列表:</p>
         {
             // 排序
@@ -155,7 +155,7 @@ const commandDetail = (command: Command) => {
     }
 
     return (
-        <div key={`command help ${name} result ${new Date().getTime()}`} className={css.command_help}>
+        <div key={`command help ${name} result ${crypto.randomUUID()}`} className={css.command_help}>
             <p className={css.command_list_desc}>命令: {desc}</p>
             <p className={css.command_list_desc}>用法: {commandUseFunc(command)}</p>
             { paramsCreator() }

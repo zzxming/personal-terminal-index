@@ -13,7 +13,7 @@ const biliSearchResultList = (keywords: string, typeStr: string, commandHandle: 
     // 根据 typeStr 进行组件筛选, 显示不同的搜索结果
 
     return <BiliVideoList 
-        key={`bili search result ${typeStr} ${new Date().getTime()}`} 
+        key={`bili search result ${typeStr} ${crypto.randomUUID()}`} 
         typeStr={typeStr} 
         keywords={keywords} 
         commandHandle={commandHandle}

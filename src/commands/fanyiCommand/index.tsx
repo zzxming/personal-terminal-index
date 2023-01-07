@@ -94,7 +94,7 @@ const fanyiCommand: Command = {
             // console.log(data.error_msg);
             return {
                 constructor: (
-                    <div key={`translate result ${error_code} ${new Date().getTime()}`} className={css.command_txt}>
+                    <div key={`translate result ${error_code} ${crypto.randomUUID()}`} className={css.command_txt}>
                         error code: {error_code}, {error_message}, detail see <a href="https://api.fanyi.baidu.com/doc/21" style={{color: '#1890ff'}}>接入文档</a>
                     </div>
                 ),
@@ -106,7 +106,7 @@ const fanyiCommand: Command = {
             const { trans_result, to, from } = resData;
             return {
                 constructor: (
-                    <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${new Date().getTime()}`} className={css.command_txt}>
+                    <div key={`translate result ${trans_result[0].src}-${trans_result[0].dst} ${crypto.randomUUID()}`} className={css.command_txt}>
                         从{lang[from]}: {trans_result[0].src}，翻译成{lang[to]}: {trans_result[0].dst}
                     </div>
                 ),

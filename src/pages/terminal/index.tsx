@@ -17,7 +17,6 @@ const Terminal: React.FC = () => {
     const [hintTxt, setHintTxt] = useState('');
     const view = useRef<HTMLDivElement>(null);
     const inp = useRef<HTMLInputElement>(null);
-    const [inputMargin, setInputMargin] = useState<number>(0);
     const [outputStyle, setOuptputStyle] = useState<React.CSSProperties>({});
     
     // localstorage更新
@@ -32,9 +31,8 @@ const Terminal: React.FC = () => {
 
     // localstorage中config初始化及更新处理函数
     const configChange = () => {
-        let { style, mark } = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
+        let { style } = localStorageGetItem(LOCALSTORAGECONFIG) as ConfigData;
         setOuptputStyle(style ? style : {});
-        setInputMargin((mark ? 58 : 0))
     }
   
     // 保持输入会在屏幕内,最下方
@@ -155,7 +153,7 @@ const Terminal: React.FC = () => {
                 <div className={css.terminal_mask} onClick={focusInput} style={outputStyle}>
                     <MarkNav />
                     <TimeCount />
-                    <div ref={view} className={css.terminal_command} style={{top: `${inputMargin}px`,height: `calc(100% - ${inputMargin}px)`}}>
+                    <div ref={view} className={css.terminal_command}>
                         {
                             commands && commands.map((item) => (
                                 <div key={'local' + item.key} className={css.command_result}>

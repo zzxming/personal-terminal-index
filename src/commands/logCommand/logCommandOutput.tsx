@@ -259,7 +259,8 @@ const GetLogTable: React.FC = () => {
                 }
                 // console.log(moment(moment(time, 'HH:mm:ss').valueOf() + 1000).format('HH:mm:ss'), time)
                 time = moment(moment(time, 'HH:mm:ss').valueOf() + 1000).format('HH:mm:ss');
-            } while(updateLogData.find(log => log.key === time))
+                if (updateLogData.find(log => log.key === time)) break;
+            } while(true)
         }
         // console.log(key, columns);
         updateLogData.push({
